@@ -1,0 +1,2393 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>学习小助理</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Fredoka+One&family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --cream:#FFFBF0;
+  --soft-white:#FFFFFF;
+  --peach:#FFB5A7;--peach-l:#FFF0ED;--peach-d:#E8624A;
+  --mint:#A8E6CF;--mint-l:#E8F8F2;--mint-d:#3DAA78;
+  --sky:#A8D8EA;--sky-l:#E8F5FA;--sky-d:#3A90B5;
+  --lemon:#FFE066;--lemon-l:#FFFAE0;--lemon-d:#C9A000;
+  --lilac:#C9B8E8;--lilac-l:#F2EEF9;--lilac-d:#7A5CB8;
+  --coral:#FFB347;--coral-l:#FFF3E0;--coral-d:#C07000;
+  --rose:#F4A0B5;--rose-l:#FDE8EE;--rose-d:#C04070;
+  --sage:#B5D5B0;--sage-l:#EAF4E8;--sage-d:#4A8045;
+  --text:#4A3728;--muted:#A0907C;--light:#C8B8A8;
+  --radius:18px;
+  --shadow:0 4px 20px rgba(100,80,60,0.10);
+  --shadow-sm:0 2px 12px rgba(100,80,60,0.08);
+}
+
+body{
+  font-family:'Noto Sans SC',sans-serif;
+  background:var(--cream);
+  color:var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+  background-image:
+    radial-gradient(circle at 20% 20%, #FFE8D620 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, #E8F5FA30 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, #F2EEF920 0%, transparent 60%);
+}
+
+/* ===== BANNER ===== */
+.banner{
+  background:linear-gradient(160deg,#FFE0D5 0%,#FFF5D0 35%,#D5EFF9 70%,#E8E0F5 100%);
+  position:relative;overflow:hidden;border-bottom:3px solid #F5E8D8;
+}
+.banner::before{
+  content:'';position:absolute;inset:0;
+  background:url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='10' cy='10' r='3' fill='%23FFB5A730'/%3E%3Ccircle cx='50' cy='30' r='2' fill='%23A8E6CF40'/%3E%3Ccircle cx='70' cy='60' r='4' fill='%23C9B8E840'/%3E%3Ccircle cx='30' cy='65' r='2.5' fill='%23FFE06640'/%3E%3C/svg%3E");
+}
+.banner-inner{padding:18px 18px 14px;position:relative;z-index:2;}
+.banner-stars{position:absolute;inset:0;z-index:1;pointer-events:none;}
+.bstar{position:absolute;animation:twinkle 3s infinite ease-in-out;}
+@keyframes twinkle{0%,100%{opacity:0.2;transform:scale(0.7);}50%{opacity:0.7;transform:scale(1.1);}}
+.app-name-row{display:flex;align-items:center;gap:12px;margin-bottom:8px;}
+.mascot{font-size:40px;animation:bounce 2.5s infinite ease-in-out;filter:drop-shadow(0 4px 8px rgba(200,100,80,0.2));}
+@keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-7px);}}
+.app-title{font-family:'Fredoka One',cursive;font-size:22px;color:#5C3D2E;line-height:1.25;}
+.app-title .student-name{color:#E8624A;}
+.name-edit-btn{background:rgba(255,255,255,0.6);border:1.5px solid rgba(200,160,120,0.3);border-radius:20px;padding:4px 12px;color:#A0907C;font-size:11px;font-weight:700;cursor:pointer;font-family:'Noto Sans SC',sans-serif;margin-top:5px;display:inline-block;backdrop-filter:blur(4px);}
+.name-input-row{display:none;margin-top:8px;align-items:center;}
+.name-input-row input{background:rgba(255,255,255,0.8);border:2px solid #F4A0B5;border-radius:12px;padding:6px 12px;color:#5C3D2E;font-family:'Fredoka One',cursive;font-size:18px;width:170px;outline:none;}
+.name-input-row button{margin-left:8px;background:#FFB5A7;border:none;border-radius:12px;padding:7px 16px;font-weight:800;cursor:pointer;font-family:'Noto Sans SC',sans-serif;font-size:13px;color:#5C1A10;}
+.banner-bottom{display:flex;align-items:center;justify-content:space-between;margin-top:10px;}
+.star-pill{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,0.55);border:1.5px solid rgba(255,200,100,0.4);border-radius:20px;padding:5px 13px;color:#5C3D2E;font-size:13px;font-weight:700;backdrop-filter:blur(4px);}
+.star-pill b{color:#C9A000;font-family:'Fredoka One',cursive;font-size:16px;}
+.streak-pill{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,0.55);border:1.5px solid rgba(255,160,80,0.4);border-radius:20px;padding:5px 13px;color:#5C3D2E;font-size:12px;font-weight:700;backdrop-filter:blur(4px);}
+
+/* ===== TABS ===== */
+.subject-tabs{background:#FFFBF5;display:flex;overflow-x:auto;scrollbar-width:none;border-bottom:2px solid #F0E4D4;position:sticky;top:0;z-index:50;box-shadow:0 2px 12px rgba(100,80,60,0.07);}
+.subject-tabs::-webkit-scrollbar{display:none;}
+.stab{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;padding:10px 16px 8px;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all 0.2s;min-width:66px;}
+.stab .ti{font-size:19px;}
+.stab .tn{font-size:11px;font-weight:700;color:var(--muted);white-space:nowrap;margin-top:2px;}
+.stab.active .tn{color:#E8624A;}
+.stab.active{border-bottom-color:#E8624A;background:linear-gradient(180deg,#FFF5F0,#FFFBF5);}
+.stab:hover{background:#FFF8F2;}
+
+/* ===== VIEWS ===== */
+.view{display:none;padding:14px;}
+.view.active{display:block;}
+
+/* ===== SECTION BANNER ===== */
+.sec-banner{border-radius:20px;padding:16px 18px;margin-bottom:14px;display:flex;align-items:center;gap:14px;position:relative;overflow:hidden;border:2px solid rgba(255,255,255,0.8);}
+.sec-banner::after{content:attr(data-deco);position:absolute;right:8px;top:-4px;font-size:54px;opacity:0.18;}
+.sec-banner h2{font-family:'Fredoka One',cursive;font-size:20px;margin-bottom:2px;}
+.sec-banner p{font-size:12px;opacity:0.85;}
+.sec-icon{font-size:34px;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.12));}
+
+/* ===== CARD ===== */
+.card{background:var(--soft-white);border-radius:20px;box-shadow:var(--shadow);padding:16px;margin-bottom:14px;border:2px solid #F5EDE0;}
+.card-title{font-size:14px;font-weight:900;margin-bottom:12px;display:flex;align-items:center;gap:6px;color:#5C3D2E;}
+
+/* ===== SCENE GRID ===== */
+.scene-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+.scene-card{border-radius:18px;padding:14px 10px;text-align:center;cursor:pointer;transition:all 0.25s cubic-bezier(0.34,1.4,0.64,1);border:2.5px solid;position:relative;background:#fff;}
+.scene-card:hover{transform:translateY(-5px) scale(1.02);box-shadow:0 10px 28px rgba(100,80,60,0.15);}
+.scene-card:active{transform:scale(0.96);}
+.scene-card .sce{font-size:32px;margin-bottom:7px;display:block;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.1));}
+.scene-card .scn{font-size:12px;font-weight:800;color:#4A3728;}
+.scene-card .scd{font-size:10px;color:var(--muted);margin-top:3px;}
+.scene-card .scb{position:absolute;top:7px;right:7px;font-size:9px;font-weight:800;padding:2px 7px;border-radius:10px;color:#fff;}
+
+/* ===== LESSON OVERLAY ===== */
+.lesson-overlay{display:none;position:fixed;inset:0;background:var(--cream);z-index:200;overflow-y:auto;}
+.lesson-overlay.show{display:block;}
+.lesson-top{background:linear-gradient(135deg,#FFB5A7,#F4A0B5,#C9B8E8);padding:16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:10;border-bottom:2px solid rgba(255,255,255,0.4);}
+.back-btn{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.4);border:1.5px solid rgba(255,255,255,0.5);color:#5C3D2E;font-size:18px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.lesson-info{flex:1;color:#fff;}
+.lesson-info h3{font-family:'Fredoka One',cursive;font-size:18px;text-shadow:0 1px 3px rgba(0,0,0,0.15);}
+.lesson-info p{font-size:11px;opacity:0.9;margin-top:1px;}
+.prog-bar{height:7px;background:rgba(255,255,255,0.35);border-radius:4px;margin-top:8px;}
+.prog-fill{height:7px;background:rgba(255,255,255,0.9);border-radius:4px;transition:width 0.4s;}
+.lesson-body{padding:14px;}
+
+/* ===== SENTENCE CARD ===== */
+.sent-card{background:#fff;border-radius:20px;box-shadow:var(--shadow);padding:16px;margin-bottom:12px;border:2px solid var(--peach-l);}
+.sent-person{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.p-icon{font-size:22px;}
+.p-label{font-size:11px;font-weight:800;color:var(--peach-d);background:var(--peach-l);padding:3px 10px;border-radius:12px;}
+.sent-en{font-family:'Baloo 2',cursive;font-size:19px;font-weight:700;color:#5C3D2E;line-height:1.45;border-left:4px solid var(--peach);padding-left:12px;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+.sent-zh{font-size:13px;color:var(--muted);font-weight:600;padding-left:16px;}
+.sent-ctx{font-size:11px;color:var(--light);margin-top:5px;padding-left:16px;font-style:italic;}
+.sent-btns{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;}
+.sbtn{padding:9px 14px;border-radius:30px;border:none;font-family:'Noto Sans SC',sans-serif;font-size:12px;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:4px;transition:all 0.18s;flex:1;justify-content:center;}
+.sbtn:active{transform:scale(0.94);}
+.sbtn-play{background:var(--sky);color:#1A5070;border:2px solid var(--sky-d);}
+.sbtn-play:hover{background:var(--sky-d);color:#fff;}
+.sbtn-slow{background:var(--lemon);color:#6B5000;border:2px solid var(--lemon-d);}
+.sbtn-slow:hover{filter:brightness(0.95);}
+.sbtn-star{background:none;border:2.5px solid var(--lemon-d);color:var(--lemon-d);font-size:18px;flex:0 0 auto;width:42px;padding:0;border-radius:30px;cursor:pointer;transition:all 0.2s;}
+.sbtn-star:hover{background:var(--lemon-l);}
+.sbtn-star.fav{background:var(--lemon);color:#6B5000;border-color:var(--lemon-d);}
+.sbtn-nav{background:var(--lilac-l);color:var(--lilac-d);border:2px solid var(--lilac);}
+.sbtn-nav:hover{background:var(--lilac);color:#fff;}
+.sbtn-next{background:var(--peach);color:#5C1A10;border:2px solid var(--peach-d);}
+.sbtn-next:hover{background:var(--peach-d);color:#fff;}
+.wave-bars{display:none;align-items:center;gap:3px;}
+.wave-bars.on{display:flex;}
+.wb{width:3px;height:13px;background:var(--sky-d);border-radius:2px;animation:wv 0.8s infinite ease-in-out;}
+.wb:nth-child(2){animation-delay:.15s;height:19px;}
+.wb:nth-child(3){animation-delay:.3s;}
+@keyframes wv{0%,100%{transform:scaleY(0.5);}50%{transform:scaleY(1.5);}}
+
+/* ===== SENT LIST ===== */
+.sent-list-item{padding:9px 10px;border-radius:12px;margin-bottom:5px;cursor:pointer;border:2px solid transparent;transition:all 0.15s;display:flex;align-items:center;gap:8px;}
+.sent-list-item:hover{background:var(--peach-l);}
+.sent-list-item.active{background:var(--peach-l);border-color:var(--peach);}
+.sli-num{font-size:10px;font-weight:800;color:var(--muted);min-width:20px;}
+.sli-en{font-size:12px;font-weight:700;color:var(--text);}
+.sli-zh{font-size:11px;color:var(--muted);}
+.sli-play{font-size:16px;margin-left:auto;opacity:0.45;cursor:pointer;background:none;border:none;}
+.sli-play:hover{opacity:1;}
+
+/* ===== PINYIN ===== */
+.pz-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;}
+.pz-cell{background:var(--sky-l);border-radius:14px;padding:10px 4px;text-align:center;cursor:pointer;transition:all 0.2s;border:2px solid transparent;}
+.pz-cell:hover{border-color:var(--sky);transform:scale(1.05);}
+.pz-cell.active{background:var(--sky);border-color:var(--sky-d);}
+.pz-char{font-size:20px;font-weight:900;color:var(--text);}
+.pz-py{font-size:11px;color:var(--sky-d);font-weight:700;margin-top:2px;}
+.pz-cell.active .pz-char,.pz-cell.active .pz-py{color:#fff;}
+
+/* ===== POEMS ===== */
+.poem-card{background:#fff;border-radius:18px;box-shadow:var(--shadow-sm);padding:16px;margin-bottom:12px;border:2px solid var(--lemon-l);transition:all 0.2s;}
+.poem-card:hover{transform:translateY(-2px);box-shadow:var(--shadow);border-color:var(--lemon);}
+.poem-title{font-size:15px;font-weight:900;color:#5C3D2E;margin-bottom:2px;}
+.poem-author{font-size:11px;color:var(--muted);margin-bottom:10px;}
+.poem-text{font-size:15px;line-height:2.3;color:var(--text);letter-spacing:2px;border-left:4px solid var(--coral);padding-left:12px;}
+.poem-pinyin-block{font-size:11px;color:var(--sky-d);letter-spacing:1px;margin-bottom:6px;line-height:2.1;padding-left:16px;}
+.poem-meaning{font-size:12px;color:#7A6558;margin-top:8px;line-height:1.8;display:none;background:var(--lemon-l);border-radius:12px;padding:10px 12px;border-left:3px solid var(--lemon-d);}
+.poem-actions{display:flex;gap:8px;margin-top:12px;}
+.pa{flex:1;padding:9px;border-radius:20px;border:2px solid;font-family:'Noto Sans SC',sans-serif;font-size:12px;font-weight:800;cursor:pointer;transition:all 0.18s;}
+.pa:hover{filter:brightness(0.92);}
+.pa-read{background:var(--coral-l);color:var(--coral-d);border-color:var(--coral);}
+.pa-py{background:var(--sky-l);color:var(--sky-d);border-color:var(--sky);}
+.pa-mean{background:var(--lemon-l);color:var(--lemon-d);border-color:var(--lemon);}
+
+/* ===== MATH ===== */
+.math-type-btns{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px;}
+.mt-btn{padding:7px 14px;border-radius:20px;border:2px solid #E8D8C8;background:#fff;font-size:12px;font-weight:800;cursor:pointer;color:var(--muted);transition:all 0.18s;font-family:'Noto Sans SC',sans-serif;}
+.mt-btn:hover{border-color:var(--mint);background:var(--mint-l);}
+.mt-btn.active{background:var(--mint);color:#1A5C35;border-color:var(--mint-d);}
+.math-q{font-family:'Fredoka One',cursive;font-size:30px;text-align:center;color:#2A6040;padding:18px;background:var(--mint-l);border-radius:16px;margin-bottom:14px;white-space:pre-line;line-height:1.4;border:2px solid var(--mint);}
+.input-row{display:flex;gap:8px;margin-bottom:12px;}
+.input-row input{flex:1;border:2.5px solid var(--mint);border-radius:14px;padding:10px 14px;font-family:'Fredoka One',cursive;font-size:24px;text-align:center;outline:none;color:#2A6040;background:var(--mint-l);}
+.input-row input:focus{border-color:var(--mint-d);box-shadow:0 0 0 3px rgba(168,230,207,0.3);}
+.input-row button{padding:10px 18px;border-radius:14px;border:none;background:var(--mint-d);color:#fff;font-family:'Noto Sans SC',sans-serif;font-size:13px;font-weight:800;cursor:pointer;}
+.math-opts{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:8px;}
+.math-opt{padding:14px;border-radius:16px;border:2.5px solid #E0F0E8;background:#FAFFFE;font-family:'Fredoka One',cursive;font-size:24px;text-align:center;cursor:pointer;transition:all 0.2s;color:#2A6040;font-weight:900;}
+.math-opt:hover{border-color:var(--mint);background:var(--mint-l);transform:scale(1.04);}
+.math-opt.correct{background:var(--mint);color:#fff;border-color:var(--mint-d);}
+.math-opt.wrong{background:var(--rose-l);color:var(--rose-d);border-color:var(--rose);animation:shake 0.4s;}
+@keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px);}}
+.math-result{text-align:center;padding:12px;border-radius:14px;margin-top:10px;font-size:14px;font-weight:800;display:none;}
+.math-result.show{display:block;}
+.math-result.ok{background:var(--mint-l);color:#1A5C35;border:2px solid var(--mint);}
+.math-result.no{background:var(--rose-l);color:var(--rose-d);border:2px solid var(--rose);}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.stat-box{border-radius:14px;padding:12px;text-align:center;}
+.stat-num{font-size:26px;font-weight:900;font-family:'Fredoka One',cursive;}
+.stat-lbl{font-size:11px;color:var(--muted);font-weight:700;margin-top:2px;}
+
+/* ===== SCIENCE ===== */
+.sci-topic-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px;}
+.sci-topic{border-radius:16px;padding:13px;text-align:center;cursor:pointer;transition:all 0.22s cubic-bezier(0.34,1.4,0.64,1);border:2.5px solid;background:#fff;}
+.sci-topic:hover{transform:translateY(-4px);box-shadow:0 8px 20px rgba(100,80,60,0.13);}
+.sci-topic.active{box-shadow:0 4px 14px rgba(100,80,60,0.15);}
+.st-icon{font-size:26px;margin-bottom:4px;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.08));}
+.st-name{font-size:12px;font-weight:800;color:var(--text);}
+.sci-question{font-size:15px;font-weight:800;color:#2A4A6A;margin-bottom:14px;line-height:1.6;}
+.sci-opts{display:flex;flex-direction:column;gap:8px;}
+.sci-opt{padding:11px 14px;border-radius:14px;border:2.5px solid var(--sky-l);background:#FAFEFF;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.18s;text-align:left;color:var(--text);}
+.sci-opt:hover{border-color:var(--sky);background:var(--sky-l);}
+.sci-opt.correct{background:var(--mint);color:#fff;border-color:var(--mint-d);}
+.sci-opt.wrong{background:var(--rose-l);border-color:var(--rose);}
+.sci-explain{background:var(--sky-l);border-radius:14px;padding:12px 14px;margin-top:10px;font-size:13px;color:#2A5570;font-weight:600;display:none;line-height:1.7;border-left:4px solid var(--sky);}
+.sci-explain.show{display:block;}
+.sci-next{margin-top:10px;width:100%;padding:12px;border-radius:30px;border:none;background:var(--sky);color:#1A4060;font-family:'Noto Sans SC',sans-serif;font-size:14px;font-weight:800;cursor:pointer;display:none;border:2px solid var(--sky-d);}
+.sci-next.show{display:block;}
+
+/* ===== VIRTUE ===== */
+.virtue-tag{display:inline-block;font-size:11px;font-weight:800;padding:3px 12px;border-radius:12px;margin-bottom:10px;border:1.5px solid;}
+.virtue-story{font-size:14px;line-height:2;color:#5C4030;margin-bottom:12px;background:linear-gradient(135deg,var(--lemon-l),var(--peach-l));border-radius:14px;padding:14px;border:2px solid var(--peach-l);}
+.virtue-question{font-size:15px;font-weight:800;color:var(--text);margin-bottom:12px;}
+.virtue-opt{padding:12px 14px;border-radius:14px;border:2.5px solid #EEE0D0;background:#fff;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.18s;text-align:left;width:100%;display:block;font-family:'Noto Sans SC',sans-serif;margin-bottom:8px;color:var(--text);}
+.virtue-opt:hover{border-color:var(--coral);background:var(--coral-l);transform:translateX(3px);}
+.virtue-opt.good{background:var(--mint);color:#1A5C35;border-color:var(--mint-d);}
+.virtue-opt.bad{background:var(--rose-l);border-color:var(--rose);}
+.virtue-feedback{border-radius:14px;padding:12px 14px;margin-top:8px;font-size:13px;font-weight:700;display:none;line-height:1.7;}
+.virtue-feedback.show{display:block;}
+.virtue-feedback.good{background:var(--mint-l);color:#1A5C35;border:2px solid var(--mint);}
+.virtue-feedback.bad{background:var(--rose-l);color:var(--rose-d);border:2px solid var(--rose);}
+.virtue-next-btn{margin-top:10px;width:100%;padding:12px;border-radius:30px;border:2px solid var(--coral-d);background:var(--coral);color:#5C2A00;font-family:'Noto Sans SC',sans-serif;font-size:14px;font-weight:800;cursor:pointer;display:none;}
+.virtue-next-btn.show{display:block;}
+
+/* ===== FAVORITES ===== */
+.fav-item{background:#fff;border-radius:16px;padding:13px;margin-bottom:8px;box-shadow:var(--shadow-sm);display:flex;align-items:center;gap:10px;border:2px solid var(--lemon-l);}
+.fav-en{font-size:13px;font-weight:700;color:var(--text);}
+.fav-zh{font-size:11px;color:var(--muted);margin-top:2px;}
+.fav-scene{font-size:10px;color:var(--lilac-d);margin-top:2px;}
+.fav-del{background:none;border:none;font-size:16px;cursor:pointer;opacity:0.4;flex-shrink:0;}
+.fav-del:hover{opacity:1;}
+.empty-state{text-align:center;padding:40px 20px;color:var(--muted);}
+.empty-state .ei{font-size:48px;margin-bottom:12px;}
+.empty-state p{font-size:14px;font-weight:600;}
+
+/* ===== REWARD POPUP ===== */
+.reward-pop{display:none;position:fixed;inset:0;z-index:999;align-items:center;justify-content:center;background:rgba(80,50,30,0.35);padding:20px;backdrop-filter:blur(6px);}
+.reward-pop.show{display:flex;}
+.reward-box{background:linear-gradient(160deg,#FFFDF5,#FFF0E8);border-radius:28px;padding:32px 28px;text-align:center;max-width:300px;width:100%;animation:popIn 0.4s cubic-bezier(0.34,1.56,0.64,1);border:3px solid var(--lemon);box-shadow:0 12px 48px rgba(100,80,60,0.2);}
+@keyframes popIn{from{transform:scale(0.5);opacity:0;}to{transform:scale(1);opacity:1;}}
+.reward-icon{font-size:56px;animation:spin 1.5s linear infinite;}
+@keyframes spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+.reward-title{font-family:'Fredoka One',cursive;font-size:26px;color:#5C3D2E;margin:12px 0 6px;}
+.reward-sub{font-size:14px;color:var(--muted);}
+.reward-close{margin-top:18px;padding:12px 32px;border-radius:30px;border:none;background:linear-gradient(135deg,var(--peach),var(--rose));color:#fff;font-family:'Noto Sans SC',sans-serif;font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 4px 16px rgba(255,160,100,0.35);}
+
+/* ===== FLOAT STAR ===== */
+@keyframes floatUp{0%{transform:translateY(0) scale(1);opacity:1;}100%{transform:translateY(-80px) scale(0.5);opacity:0;}}
+.float-star{position:fixed;pointer-events:none;z-index:9999;font-size:24px;animation:floatUp 1s ease-out forwards;}
+</style>
+</head>
+<body>
+
+<!-- BANNER -->
+<div class="banner">
+  <div class="banner-stars" id="bannerStars"></div>
+  <div class="banner-inner">
+    <div class="app-name-row">
+      <div class="mascot">🦄</div>
+      <div>
+        <div class="app-title"><span class="student-name" id="studentNameDisplay">嘉禾</span>的学习小助理</div>
+        <button class="name-edit-btn" onclick="toggleNameEdit()">✏️ 修改名字</button>
+        <div class="name-input-row" id="nameInputRow">
+          <input type="text" id="nameInput" placeholder="输入名字" maxlength="8">
+          <button onclick="saveName()">确定</button>
+        </div>
+      </div>
+    </div>
+    <div class="banner-bottom">
+      <div class="star-pill">⭐ <b id="totalStars">0</b> 颗星星</div>
+      <div class="streak-pill">🔥 连续 <b style="color:#FFD166;margin:0 2px;" id="streakDays">1</b> 天</div>
+    </div>
+  </div>
+</div>
+
+<!-- SUBJECT TABS -->
+<div class="subject-tabs">
+  <div class="stab active" onclick="switchSubject('english')" id="tab-english"><div class="ti">✏️</div><div class="tn">英文</div></div>
+  <div class="stab" onclick="switchSubject('chinese')" id="tab-chinese"><div class="ti">📖</div><div class="tn">语文</div></div>
+  <div class="stab" onclick="switchSubject('math')" id="tab-math"><div class="ti">🔢</div><div class="tn">数学</div></div>
+  <div class="stab" onclick="switchSubject('science')" id="tab-science"><div class="ti">🔬</div><div class="tn">科学</div></div>
+  <div class="stab" onclick="switchSubject('virtue')" id="tab-virtue"><div class="ti">❤️</div><div class="tn">品德</div></div>
+  <div class="stab" onclick="switchSubject('favorites')" id="tab-favorites"><div class="ti">⭐</div><div class="tn">收藏</div></div>
+</div>
+
+<!-- ENGLISH VIEW -->
+<div class="view active" id="view-english">
+  <div class="sec-banner" style="background:linear-gradient(135deg,#7C3AED,#EC4899);" data-deco="🔤">
+    <div class="sec-icon">🗣️</div>
+    <div><h2>英文学习</h2><p>日常对话 · 美式标准发音</p></div>
+  </div>
+  <div class="card">
+    <div class="card-title">🎯 选择场景</div>
+    <div class="scene-grid" id="sceneGrid"></div>
+  </div>
+</div>
+
+<!-- LESSON OVERLAY -->
+<div class="lesson-overlay" id="lessonOverlay">
+  <div class="lesson-top">
+    <button class="back-btn" onclick="closeLesson()">←</button>
+    <div class="lesson-info">
+      <h3 id="lessonTitle">场景名称</h3>
+      <p id="lessonDesc">描述</p>
+      <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+    </div>
+    <div style="font-size:24px;" id="lessonEmoji">🏠</div>
+  </div>
+  <div class="lesson-body">
+    <div class="sent-card" id="sentCard">
+      <div class="sent-person">
+        <div class="p-icon" id="pIcon">👧</div>
+        <div class="p-label" id="pLabel">说</div>
+      </div>
+      <div class="sent-en" id="sentEN">
+        <span id="sentENText">Hello!</span>
+        <div class="wave-bars" id="waveBars"><div class="wb"></div><div class="wb"></div><div class="wb"></div></div>
+      </div>
+      <div class="sent-zh" id="sentZH">你好！</div>
+      <div class="sent-ctx" id="sentCtx"></div>
+      <div class="sent-btns">
+        <button class="sbtn sbtn-play" onclick="speakEN()">🔊 朗读</button>
+        <button class="sbtn sbtn-slow" onclick="speakENSlow()">🐢 慢速</button>
+        <button class="sbtn-star" id="favStarBtn" onclick="toggleEnFav()">☆</button>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <button class="sbtn sbtn-nav" onclick="prevSent()">← 上一句</button>
+        <button class="sbtn sbtn-next" onclick="nextSent()">下一句 →</button>
+      </div>
+    </div>
+    <div class="card" style="padding:14px;">
+      <div class="card-title" style="font-size:13px;justify-content:space-between;">
+        <span>📋 全部句子</span>
+        <span id="sentListCount" style="color:var(--muted);font-weight:400;font-size:12px;"></span>
+      </div>
+      <div id="sentList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- CHINESE VIEW -->
+<div class="view" id="view-chinese">
+  <div class="sec-banner" style="background:linear-gradient(135deg,#FFE8B0,#FFF5D0);color:#5C3D2E;" data-deco="📖">
+    <div class="sec-icon">🎋</div>
+    <div><h2>语文天地</h2><p>认字·拼音·古诗·看图说话</p></div>
+  </div>
+  <div style="display:flex;gap:8px;margin-bottom:14px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;">
+    <button class="ch-tab" id="cht-pinyin" onclick="switchChinese('pinyin',this)" style="flex:0 0 auto;padding:8px 14px;border-radius:20px;border:2px solid #FFB347;background:#FFE8CC;color:#C07000;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;">📖 拼音</button>
+    <button class="ch-tab" id="cht-chars" onclick="switchChinese('chars',this)" style="flex:0 0 auto;padding:8px 14px;border-radius:20px;border:2px solid #A8D8EA;background:#E8F5FA;color:#3A90B5;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;">🔤 认字</button>
+    <button class="ch-tab" id="cht-poems" onclick="switchChinese('poems',this)" style="flex:0 0 auto;padding:8px 14px;border-radius:20px;border:2px solid #A8E6CF;background:#E8F8F2;color:#3DAA78;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;">📜 古诗(30首)</button>
+    <button class="ch-tab" id="cht-stories" onclick="switchChinese('stories',this)" style="flex:0 0 auto;padding:8px 14px;border-radius:20px;border:2px solid #C9B8E8;background:#F2EEF9;color:#7A5CB8;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;">🖼️ 看图说话</button>
+  </div>
+  <div id="ch-pinyin">
+    <div class="card">
+      <div class="card-title">🍃 拼音练习（点击听发音）</div>
+      <div class="pz-grid" id="pinyinGrid"></div>
+    </div>
+  </div>
+  <div id="ch-chars" style="display:none;">
+    <div class="card">
+      <div class="card-title">🔤 按主题认字（点击主题开始学习）</div>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px;" id="charThemeGrid"></div>
+    </div>
+    <div class="card" id="charLearnCard" style="display:none;">
+      <div class="card-title" id="charThemeTitle">🌸 春夏秋冬</div>
+      <div id="charLearnBody"></div>
+    </div>
+  </div>
+  <div id="ch-poems" style="display:none;">
+    <div class="card">
+      <div class="card-title">📜 古诗词（30首·一至三年级）</div>
+      <div id="poemList"></div>
+    </div>
+  </div>
+  <div id="ch-stories" style="display:none;">
+    <div class="card">
+      <div class="card-title">🖼️ 看图说话</div>
+      <div id="storyList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MATH VIEW -->
+<div class="view" id="view-math">
+  <div class="sec-banner" style="background:linear-gradient(135deg,#C8EDD8,#C8E8F5);color:#2A4A30;" data-deco="🔢">
+    <div class="sec-icon">🧮</div>
+    <div><h2>数学乐园</h2><p>答对题目赢取星星奖励 ⭐</p></div>
+  </div>
+  <div class="card">
+    <div class="card-title">📐 选择题型</div>
+    <div class="math-type-btns">
+      <button class="mt-btn active" onclick="setMathType('add',this)">➕ 加法</button>
+      <button class="mt-btn" onclick="setMathType('sub',this)">➖ 减法</button>
+      <button class="mt-btn" onclick="setMathType('mix',this)">🔀 混合</button>
+      <button class="mt-btn" onclick="setMathType('count',this)">🔢 数数</button>
+      <button class="mt-btn" onclick="setMathType('compare',this)">⚖️ 大小</button>
+      <button class="mt-btn" onclick="setMathType('word',this)">📝 应用题</button>
+      <button class="mt-btn" onclick="setMathType('word',this)">📝 应用题</button>
+    </div>
+    <button id="mathQSpeaker" onclick="if(currentWordProblem){readAloud(currentWordProblem.q+'。提示：'+currentWordProblem.hint);}" style="display:none;background:linear-gradient(135deg,#E8F5FA,#D0EAF5);border:2px solid #A8D8EA;border-radius:20px;padding:6px 16px;font-size:13px;font-weight:800;cursor:pointer;color:#3A90B5;font-family:inherit;margin-bottom:8px;width:100%;">🔊 再听一遍题目</button>
+<div class="math-q" id="mathQ" onclick="if(currentWordProblem){readAloud(currentWordProblem.q+'。提示：'+currentWordProblem.hint);}" style="cursor:pointer;" title="点击朗读">3 + 4 = ?</div>
+    <div class="input-row" id="inputRow">
+      <input type="number" id="mathInput" placeholder="答案" min="0" max="200">
+      <button onclick="checkMathInput()">确认</button>
+    </div>
+    <div class="math-opts" id="mathOpts"></div>
+    <div class="math-result" id="mathResult"></div>
+    <button onclick="newMathQ()" style="width:100%;padding:12px;border-radius:30px;border:2px solid #3DAA78;background:#A8E6CF;color:#1A5C35;font-weight:800;font-size:14px;cursor:pointer;font-family:'Noto Sans SC',sans-serif;margin-top:12px;">🎲 换一题</button>
+  </div>
+  <div class="card" style="border:2px solid #FFEEAA;">
+    <div class="card-title">🏆 今日成绩</div>
+    <div class="stats-grid">
+      <div class="stat-box" style="background:#E8F8F0;"><div class="stat-num" style="color:#2A6040;" id="mathCorrect">0</div><div class="stat-lbl">答对</div></div>
+      <div class="stat-box" style="background:#FFE8EC;"><div class="stat-num" style="color:#A03050;" id="mathWrong">0</div><div class="stat-lbl">答错</div></div>
+      <div class="stat-box" style="background:#FFF8D0;"><div class="stat-num" style="color:#8A6800;" id="mathStarsEarned">0</div><div class="stat-lbl">⭐ 赚取</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- SCIENCE VIEW -->
+<div class="view" id="view-science">
+  <div class="sec-banner" style="background:linear-gradient(135deg,#C8E8F5,#DDD0F5);color:#2A3A5A;" data-deco="🔬">
+    <div class="sec-icon">🌍</div>
+    <div><h2>科学探索</h2><p>认识世界 · 发现奥秘</p></div>
+  </div>
+  <div class="card">
+    <div class="card-title">🌿 选择主题</div>
+    <div class="sci-topic-grid" id="sciTopicGrid"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">💡 科学问答</div>
+    <div id="sciQBody"></div>
+  </div>
+</div>
+
+<!-- VIRTUE VIEW -->
+<div class="view" id="view-virtue">
+  <div class="sec-banner" style="background:linear-gradient(135deg,#FFD0DC,#FFE0C8);color:#5C2A30;" data-deco="❤️">
+    <div class="sec-icon">🌸</div>
+    <div><h2>品德成长</h2><p>做个有爱心的好孩子</p></div>
+  </div>
+  <div class="card">
+    <div class="card-title">📖 品德故事与选择</div>
+    <div id="virtueBody"></div>
+  </div>
+</div>
+
+<!-- FAVORITES VIEW -->
+<div class="view" id="view-favorites">
+  <div class="sec-banner" style="background:linear-gradient(135deg,#FFF5C8,#FFE0D0);color:#5C3D2E;" data-deco="⭐">
+    <div class="sec-icon">⭐</div>
+    <div><h2>我的收藏</h2><p>常复习收藏的英文句子</p></div>
+  </div>
+  <div class="card"><div id="favBody"></div></div>
+</div>
+
+<!-- REWARD POPUP -->
+<div class="reward-pop" id="rewardPop">
+  <div class="reward-box">
+    <div class="reward-icon" id="rewardIcon">⭐</div>
+    <div class="reward-title" id="rewardTitle">太棒了！</div>
+    <div class="reward-sub" id="rewardSub">你获得了 1 颗星星！</div>
+    <button class="reward-close" onclick="closeReward()">继续加油 🚀</button>
+  </div>
+</div>
+
+<script>
+// ===== ALL DATA =====
+var ENGLISH_SCENES = [
+  {id:'family',emoji:'🏠',name:'家庭日常',color:'#C9B8E8',border:'#DDD0F5',bg:'#F5F0FF',badge:'50句',desc:'和爸爸妈妈说话',sentences:[
+    {en:"Good morning, Mama! Did you sleep well?",zh:"早上好，妈妈！你睡得好吗？",ctx:"早晨起床",person:"👩|妈妈说"},
+    {en:"Good morning, sweetie! I slept very well, thank you!",zh:"早上好，宝贝！我睡得很好，谢谢！",ctx:"妈妈回答",person:"👧|嘉禾说"},
+    {en:"Papa, can you help me tie my shoes?",zh:"爸爸，你能帮我系鞋带吗？",ctx:"穿鞋时",person:"👨|爸爸说"},
+    {en:"Of course! Come here, let me help you.",zh:"当然！过来，让我帮你。",ctx:"爸爸回答",person:"👧|嘉禾说"},
+    {en:"Grandpa, let us go for a walk together!",zh:"爷爷，我们一起去散步吧！",ctx:"下午户外",person:"👴|爷爷说"},
+    {en:"What a great idea! Let me get my hat.",zh:"好主意！让我拿帽子。",ctx:"爷爷同意",person:"👧|嘉禾说"},
+    {en:"Grandma, what are you cooking? It smells so good!",zh:"奶奶，你在煮什么？好香啊！",ctx:"厨房里",person:"👵|奶奶说"},
+    {en:"I am making your favourite soup, dear!",zh:"我在做你最爱的汤，亲爱的！",ctx:"奶奶回答",person:"👧|嘉禾说"},
+    {en:"Mama, I love you so much!",zh:"妈妈，我非常爱你！",ctx:"睡前",person:"👩|妈妈说"},
+    {en:"I love you more, my little star!",zh:"我更爱你，我的小星星！",ctx:"妈妈回答",person:"👧|嘉禾说"},
+    {en:"Papa, can we read a story tonight?",zh:"爸爸，今晚可以给我读故事吗？",ctx:"睡前时间",person:"👨|爸爸说"},
+    {en:"Absolutely! Which book do you want?",zh:"当然！你想要哪本书？",ctx:"爸爸回答",person:"👧|嘉禾说"},
+    {en:"Good night, everyone! Sweet dreams!",zh:"晚安，大家！做个好梦！",ctx:"睡觉前",person:"👩|妈妈说"},
+    {en:"Good night, Mama! Good night, Papa!",zh:"晚安，妈妈！晚安，爸爸！",ctx:"嘉禾回答",person:"👧|嘉禾说"},
+    {en:"Mama, can I watch TV for a little while?",zh:"妈妈，我可以看一会儿电视吗？",ctx:"下午时间",person:"👧|嘉禾说"},
+    {en:"You can watch for 30 minutes after homework.",zh:"做完作业可以看30分钟。",ctx:"妈妈回答",person:"👩|妈妈说"},
+    {en:"Papa, I made this drawing for you!",zh:"爸爸，这是我画给你的！",ctx:"送礼物",person:"👧|嘉禾说"},
+    {en:"Wow, it is beautiful! I will hang it on the wall.",zh:"哇，太漂亮了！我要挂在墙上。",ctx:"爸爸夸奖",person:"👨|爸爸说"},
+    {en:"Grandma, can you teach me how to cook?",zh:"奶奶，你能教我做饭吗？",ctx:"厨房里",person:"👧|嘉禾说"},
+    {en:"Of course! Wash your hands first, dear.",zh:"当然！先洗手，亲爱的。",ctx:"奶奶回答",person:"👵|奶奶说"},
+    {en:"Papa, I fell down and hurt my knee.",zh:"爸爸，我摔倒了，膝盖受伤了。",ctx:"受伤时",person:"👧|嘉禾说"},
+    {en:"Let me see. Do not cry, you are so brave!",zh:"让我看看。别哭，你真的很勇敢！",ctx:"爸爸安慰",person:"👨|爸爸说"},
+    {en:"Mama, can we go to the park on Sunday?",zh:"妈妈，周日可以去公园吗？",ctx:"周末计划",person:"👧|嘉禾说"},
+    {en:"Yes! We can have a picnic there!",zh:"好的！我们可以去那里野餐！",ctx:"妈妈同意",person:"👩|妈妈说"},
+    {en:"Grandpa, tell me a story about when you were young!",zh:"爷爷，给我讲你小时候的故事！",ctx:"聊天时间",person:"👧|嘉禾说"},
+    {en:"Haha, okay! Come sit next to me.",zh:"哈哈，好的！过来坐到我旁边。",ctx:"爷爷开心",person:"👴|爷爷说"},
+    {en:"Time for breakfast! Come to the table, everyone!",zh:"吃早饭时间了！大家来到桌边！",ctx:"早餐时",person:"👩|妈妈说"},
+    {en:"Coming, Mama! What did you make today?",zh:"来了，妈妈！你今天做了什么？",ctx:"嘉禾问",person:"👧|嘉禾说"},
+    {en:"Please wash your hands before dinner.",zh:"晚饭前请洗手。",ctx:"饭前提醒",person:"👩|妈妈说"},
+    {en:"Okay, Mama! I will wash them right now.",zh:"好的，妈妈！我现在就去洗。",ctx:"嘉禾回答",person:"👧|嘉禾说"},
+    {en:"Papa, where are we going this weekend?",zh:"爸爸，这个周末我们去哪里？",ctx:"周末计划",person:"👧|嘉禾说"},
+    {en:"We are going to the zoo! Are you excited?",zh:"我们去动物园！你兴奋吗？",ctx:"爸爸回答",person:"👨|爸爸说"},
+    {en:"Yes! I want to see the pandas and elephants!",zh:"耶！我想看熊猫和大象！",ctx:"嘉禾兴奋",person:"👧|嘉禾说"},
+    {en:"Mama, my tummy hurts. I do not feel well.",zh:"妈妈，我肚子疼。我不舒服。",ctx:"身体不适",person:"👧|嘉禾说"},
+    {en:"Oh no! Come lie down. I will get some medicine.",zh:"哦不！过来躺下。我去拿药。",ctx:"妈妈关心",person:"👩|妈妈说"},
+    {en:"Can I call Grandma on the phone, Mama?",zh:"妈妈，我可以打电话给奶奶吗？",ctx:"想联系家人",person:"👧|嘉禾说"},
+    {en:"Of course! She will be so happy to hear from you.",zh:"当然！她听到你的声音会很开心的。",ctx:"妈妈同意",person:"👩|妈妈说"},
+    {en:"Papa, can you play with me? I am bored.",zh:"爸爸，你可以陪我玩吗？我好无聊。",ctx:"想玩耍",person:"👧|嘉禾说"},
+    {en:"Sure! Let us build blocks together!",zh:"当然！我们一起搭积木吧！",ctx:"爸爸同意",person:"👨|爸爸说"},
+    {en:"Grandpa, your hands are so warm!",zh:"爷爷，你的手好暖和！",ctx:"撒娇",person:"👧|嘉禾说"},
+    {en:"That is because I love you so much!",zh:"因为我非常爱你啊！",ctx:"爷爷回答",person:"👴|爷爷说"},
+    {en:"Mama, what is for dinner tonight?",zh:"妈妈，今晚吃什么？",ctx:"问晚餐",person:"👧|嘉禾说"},
+    {en:"Your favourite! Dumplings and soup!",zh:"你最爱的！饺子和汤！",ctx:"妈妈回答",person:"👩|妈妈说"},
+    {en:"Yay! I love dumplings so much!",zh:"耶！我超级喜欢饺子！",ctx:"嘉禾高兴",person:"👧|嘉禾说"},
+    {en:"Papa, you are the best papa in the world!",zh:"爸爸，你是世界上最好的爸爸！",ctx:"表达爱意",person:"👧|嘉禾说"},
+    {en:"And you are the best daughter in the world!",zh:"你是世界上最好的女儿！",ctx:"爸爸回应",person:"👨|爸爸说"},
+    {en:"Grandma, can I help you water the plants?",zh:"奶奶，我可以帮你浇花吗？",ctx:"主动帮忙",person:"👧|嘉禾说"},
+    {en:"What a helpful girl! Yes, please!",zh:"多么懂事的孩子！好的，来吧！",ctx:"奶奶夸奖",person:"👵|奶奶说"},
+    {en:"Mama, I finished all my homework!",zh:"妈妈，我把所有作业都做完了！",ctx:"完成作业",person:"👧|嘉禾说"},
+    {en:"Well done! I am so proud of you!",zh:"做得好！我为你感到骄傲！",ctx:"妈妈表扬",person:"👩|妈妈说"}
+  ]},
+  {id:'school',emoji:'🏫',name:'学校日常',color:'#A8D8EA',border:'#C8E8F5',bg:'#F0F8FC',badge:'50句',desc:'和老师同学互动',sentences:[
+    {en:"Good morning, Teacher! I am happy to be here.",zh:"老师早上好！我很高兴来到这里。",ctx:"进教室时",person:"👧|嘉禾说"},
+    {en:"Good morning! Please take your seat.",zh:"早上好！请坐好。",ctx:"老师回答",person:"👩‍🏫|老师说"},
+    {en:"May I go to the bathroom, please?",zh:"我可以去洗手间吗？",ctx:"课堂上",person:"👧|嘉禾说"},
+    {en:"Yes, please come back quickly.",zh:"可以去，请快点回来。",ctx:"老师回答",person:"👩‍🏫|老师说"},
+    {en:"Can you repeat that, please? I did not hear.",zh:"请再说一遍好吗？我没听清。",ctx:"上课时",person:"👧|嘉禾说"},
+    {en:"Of course. Listen carefully this time.",zh:"当然，这次仔细听。",ctx:"老师回答",person:"👩‍🏫|老师说"},
+    {en:"Teacher, I finished my work!",zh:"老师，我做完了！",ctx:"完成作业",person:"👧|嘉禾说"},
+    {en:"Great job! Let me check it for you.",zh:"很棒！让我检查一下。",ctx:"老师夸奖",person:"👩‍🏫|老师说"},
+    {en:"Hi! Do you want to play with me?",zh:"嗨！你想跟我一起玩吗？",ctx:"课间休息",person:"👧|嘉禾说"},
+    {en:"Yes! What game shall we play?",zh:"好的！我们玩什么游戏？",ctx:"朋友回答",person:"👦|朋友说"},
+    {en:"Can I borrow your pencil, please?",zh:"请问我可以借你的铅笔吗？",ctx:"课堂上",person:"👧|嘉禾说"},
+    {en:"Sure! Here you go. Please return it later.",zh:"当然！给你。请等会儿还我。",ctx:"朋友借出",person:"👦|朋友说"},
+    {en:"Sorry, I was wrong. I am very sorry.",zh:"对不起，是我不对。我非常抱歉。",ctx:"发生冲突后",person:"👧|嘉禾说"},
+    {en:"It is okay. Let us be friends again!",zh:"没关系。我们再做好朋友吧！",ctx:"朋友原谅",person:"👦|朋友说"},
+    {en:"Raise your hand if you know the answer.",zh:"知道答案的请举手。",ctx:"上课提问",person:"👩‍🏫|老师说"},
+    {en:"Teacher, I know! I know the answer!",zh:"老师，我知道！我知道答案！",ctx:"积极回答",person:"👧|嘉禾说"},
+    {en:"Excellent! You are very smart today!",zh:"太棒了！你今天真聪明！",ctx:"老师表扬",person:"👩‍🏫|老师说"},
+    {en:"Thank you, Teacher! I studied hard.",zh:"谢谢老师！我努力学习了。",ctx:"嘉禾回应",person:"👧|嘉禾说"},
+    {en:"Let us clean up our classroom together.",zh:"我们一起来打扫教室吧。",ctx:"打扫卫生",person:"👩‍🏫|老师说"},
+    {en:"I will sweep the floor! Who will wipe the board?",zh:"我来扫地！谁来擦黑板？",ctx:"嘉禾积极",person:"👧|嘉禾说"},
+    {en:"Happy birthday to you! Hip hip hooray!",zh:"祝你生日快乐！万岁！",ctx:"同学生日",person:"👦|朋友说"},
+    {en:"Thank you all so much! I am so happy!",zh:"谢谢大家！我好开心！",ctx:"嘉禾感谢",person:"👧|嘉禾说"},
+    {en:"Do not forget to bring your homework tomorrow.",zh:"明天别忘了带作业。",ctx:"放学前",person:"👩‍🏫|老师说"},
+    {en:"Yes, Teacher! I will put it in my bag now.",zh:"好的，老师！我现在就放进书包。",ctx:"嘉禾回答",person:"👧|嘉禾说"},
+    {en:"See you tomorrow! Have a good afternoon!",zh:"明天见！下午愉快！",ctx:"放学道别",person:"👩‍🏫|老师说"},
+    {en:"Goodbye, Teacher! Thank you for today!",zh:"再见，老师！谢谢你今天的教导！",ctx:"嘉禾道别",person:"👧|嘉禾说"},
+    {en:"Can I sit next to you?",zh:"我可以坐在你旁边吗？",ctx:"找座位",person:"👧|嘉禾说"},
+    {en:"Of course! I would love that!",zh:"当然！我很乐意！",ctx:"朋友欢迎",person:"👦|朋友说"},
+    {en:"Teacher, I do not understand this question.",zh:"老师，我不明白这道题。",ctx:"学习困难",person:"👧|嘉禾说"},
+    {en:"No problem! Come here, I will explain it to you.",zh:"没问题！过来，我给你解释。",ctx:"老师帮助",person:"👩‍🏫|老师说"},
+    {en:"Let us line up quietly before going out.",zh:"出去前我们安静地排好队。",ctx:"排队时",person:"👩‍🏫|老师说"},
+    {en:"Okay, Teacher! I will be quiet.",zh:"好的，老师！我会安静的。",ctx:"嘉禾回应",person:"👧|嘉禾说"},
+    {en:"Who wants to read the story out loud?",zh:"谁想大声朗读这个故事？",ctx:"语文课",person:"👩‍🏫|老师说"},
+    {en:"Me! Me! I want to read it!",zh:"我！我！我想读！",ctx:"嘉禾举手",person:"👧|嘉禾说"},
+    {en:"Today we are going to learn about animals.",zh:"今天我们来学习关于动物的知识。",ctx:"上课开始",person:"👩‍🏫|老师说"},
+    {en:"I love animals! Especially pandas!",zh:"我喜欢动物！特别是熊猫！",ctx:"嘉禾兴奋",person:"👧|嘉禾说"},
+    {en:"You are doing a great job today!",zh:"你今天表现得非常好！",ctx:"老师鼓励",person:"👩‍🏫|老师说"},
+    {en:"Thank you! I will try even harder tomorrow!",zh:"谢谢！我明天会更加努力的！",ctx:"嘉禾回应",person:"👧|嘉禾说"},
+    {en:"Can you help me with my drawing?",zh:"你可以帮我画画吗？",ctx:"美术课",person:"👧|嘉禾说"},
+    {en:"Sure! Let us draw a rainbow together!",zh:"当然！我们一起画彩虹吧！",ctx:"朋友帮忙",person:"👦|朋友说"},
+    {en:"Time for PE class! Let us go outside!",zh:"体育课时间！我们出去吧！",ctx:"体育课",person:"👩‍🏫|老师说"},
+    {en:"Yay! I love PE class! Running is so fun!",zh:"耶！我喜欢体育课！跑步好好玩！",ctx:"嘉禾高兴",person:"👧|嘉禾说"},
+    {en:"Please be quiet in the library.",zh:"在图书馆请保持安静。",ctx:"图书馆",person:"👩‍🏫|老师说"},
+    {en:"Sorry, Teacher. I will be quiet now.",zh:"对不起，老师。我现在会安静的。",ctx:"嘉禾道歉",person:"👧|嘉禾说"},
+    {en:"What is your favourite subject?",zh:"你最喜欢哪个科目？",ctx:"朋友聊天",person:"👦|朋友说"},
+    {en:"I love art and music! What about you?",zh:"我喜欢美术和音乐！你呢？",ctx:"嘉禾回答",person:"👧|嘉禾说"},
+    {en:"I love math! Numbers are so cool!",zh:"我喜欢数学！数字好酷！",ctx:"朋友回答",person:"👦|朋友说"},
+    {en:"The school trip is tomorrow! Are you ready?",zh:"明天学校郊游！你准备好了吗？",ctx:"学校活动",person:"👦|朋友说"},
+    {en:"Yes! I packed my bag last night!",zh:"准备好了！我昨晚就把包收好了！",ctx:"嘉禾期待",person:"👧|嘉禾说"},
+    {en:"Teacher, may I share my work with the class?",zh:"老师，我可以把我的作品分享给同学们吗？",ctx:"分享作品",person:"👧|嘉禾说"},
+    {en:"Of course! Please come to the front.",zh:"当然！请到前面来。",ctx:"老师同意",person:"👩‍🏫|老师说"}
+  ]},
+  {id:'food',emoji:'🍱',name:'饮食美食',color:'#FFB347',border:'#FFD8A0',bg:'#FFF8EE',badge:'50句',desc:'吃饭点餐日常',sentences:[
+    {en:"What would you like for breakfast?",zh:"你早餐想吃什么？",ctx:"早餐时间",person:"👩|妈妈说"},
+    {en:"I would like some toast and eggs, please!",zh:"我想要一些吐司和鸡蛋，谢谢！",ctx:"嘉禾点餐",person:"👧|嘉禾说"},
+    {en:"Are you hungry? Dinner is ready!",zh:"你饿了吗？晚饭好了！",ctx:"晚饭前",person:"👩|妈妈说"},
+    {en:"Yes! I am very hungry. It smells delicious!",zh:"是的！我很饿。闻起来好香！",ctx:"嘉禾回应",person:"👧|嘉禾说"},
+    {en:"Do you like vegetables?",zh:"你喜欢吃蔬菜吗？",ctx:"吃饭时",person:"👨|爸爸说"},
+    {en:"I like carrots and corn, but not broccoli.",zh:"我喜欢胡萝卜和玉米，但不喜欢西兰花。",ctx:"嘉禾回答",person:"👧|嘉禾说"},
+    {en:"Please eat your vegetables. They make you strong!",zh:"请吃蔬菜。它们让你变得强壮！",ctx:"爸爸鼓励",person:"👨|爸爸说"},
+    {en:"Can I have some more rice, please?",zh:"请问我可以再要一些饭吗？",ctx:"饭桌上",person:"👧|嘉禾说"},
+    {en:"Of course! You have a good appetite today!",zh:"当然！你今天胃口真好！",ctx:"妈妈回答",person:"👩|妈妈说"},
+    {en:"This soup is very hot. Blow on it first.",zh:"这汤很烫。先吹一吹。",ctx:"安全提醒",person:"👵|奶奶说"},
+    {en:"Thank you for reminding me, Grandma!",zh:"谢谢你提醒我，奶奶！",ctx:"嘉禾感谢",person:"👧|嘉禾说"},
+    {en:"Can we have pizza for dinner tonight?",zh:"今晚晚饭可以吃披萨吗？",ctx:"商量晚饭",person:"👧|嘉禾说"},
+    {en:"Good idea! Let us order one together.",zh:"好主意！我们一起订一个吧。",ctx:"爸爸同意",person:"👨|爸爸说"},
+    {en:"I am full. Thank you for the delicious meal!",zh:"我吃饱了。谢谢你做的美味饭菜！",ctx:"饭后",person:"👧|嘉禾说"},
+    {en:"You are welcome! Come help me clear the table.",zh:"不客气！来帮我收桌子吧。",ctx:"妈妈回答",person:"👩|妈妈说"},
+    {en:"Can I have some fruit for dessert?",zh:"我可以吃点水果当甜点吗？",ctx:"饭后",person:"👧|嘉禾说"},
+    {en:"Yes! We have apples, bananas and grapes.",zh:"可以！我们有苹果、香蕉和葡萄。",ctx:"妈妈回答",person:"👩|妈妈说"},
+    {en:"I want the grapes, please. I love grapes!",zh:"我要葡萄，谢谢。我很爱吃葡萄！",ctx:"嘉禾选择",person:"👧|嘉禾说"},
+    {en:"Please do not eat too much candy. It is bad for your teeth.",zh:"请不要吃太多糖。对牙齿不好。",ctx:"健康提醒",person:"👨|爸爸说"},
+    {en:"Okay, Papa. I will only have one piece.",zh:"好的，爸爸。我只吃一块。",ctx:"嘉禾同意",person:"👧|嘉禾说"},
+    {en:"Shall we go get ice cream after dinner?",zh:"晚饭后我们去吃冰淇淋好吗？",ctx:"餐后计划",person:"👨|爸爸说"},
+    {en:"Yes! Yes! I want chocolate ice cream!",zh:"好耶！好耶！我要巧克力冰淇淋！",ctx:"嘉禾兴奋",person:"👧|嘉禾说"},
+    {en:"Can I help set the table, Mama?",zh:"妈妈，我可以帮忙摆桌子吗？",ctx:"主动帮忙",person:"👧|嘉禾说"},
+    {en:"How sweet of you! Yes, please put the bowls out.",zh:"你真贴心！好的，请把碗拿出来。",ctx:"妈妈夸奖",person:"👩|妈妈说"},
+    {en:"What is this? I have never eaten it before.",zh:"这是什么？我以前没吃过。",ctx:"新食物",person:"👧|嘉禾说"},
+    {en:"This is tofu. Try a small bite, you might like it!",zh:"这是豆腐。尝一小口，你可能会喜欢的！",ctx:"妈妈介绍",person:"👩|妈妈说"},
+    {en:"Mmm! It is actually quite yummy!",zh:"嗯！其实挺好吃的！",ctx:"嘉禾品尝",person:"👧|嘉禾说"},
+    {en:"I am thirsty. Can I have some water please?",zh:"我渴了。可以给我喝水吗？",ctx:"口渴时",person:"👧|嘉禾说"},
+    {en:"Here you go. Remember to drink slowly.",zh:"给你。记得慢慢喝。",ctx:"妈妈递水",person:"👩|妈妈说"},
+    {en:"Mama, I do not like this dish. It is too spicy!",zh:"妈妈，我不喜欢这道菜。太辣了！",ctx:"不喜欢食物",person:"👧|嘉禾说"},
+    {en:"I will make something milder for you next time.",zh:"下次我给你做清淡一点的。",ctx:"妈妈回应",person:"👩|妈妈说"},
+    {en:"Can we have noodles for lunch today?",zh:"今天午饭可以吃面条吗？",ctx:"商量午饭",person:"👧|嘉禾说"},
+    {en:"Sure! Do you want egg noodles or tomato noodles?",zh:"当然！你想要鸡蛋面还是西红柿面？",ctx:"妈妈询问",person:"👩|妈妈说"},
+    {en:"Tomato noodles please! They are my favourite!",zh:"西红柿面！那是我最爱的！",ctx:"嘉禾选择",person:"👧|嘉禾说"},
+    {en:"Let us say thank you before we eat.",zh:"吃饭前我们说谢谢。",ctx:"饭前习惯",person:"👨|爸爸说"},
+    {en:"Thank you for the food! Let us eat!",zh:"感谢食物！开饭！",ctx:"嘉禾说谢谢",person:"👧|嘉禾说"},
+    {en:"Do you want some milk with your cereal?",zh:"你的麦片要加牛奶吗？",ctx:"早餐准备",person:"👩|妈妈说"},
+    {en:"Yes please! I love milk!",zh:"好的！我喜欢牛奶！",ctx:"嘉禾回答",person:"👧|嘉禾说"},
+    {en:"Eating together as a family makes me so happy.",zh:"一家人一起吃饭让我好开心。",ctx:"家庭时光",person:"👧|嘉禾说"},
+    {en:"Me too! Family meals are the best.",zh:"我也是！家庭聚餐最棒了。",ctx:"爸爸回应",person:"👨|爸爸说"},
+    {en:"Papa, can you pass the salt please?",zh:"爸爸，请把盐递给我好吗？",ctx:"饭桌礼仪",person:"👧|嘉禾说"},
+    {en:"Here you go. Do not add too much though!",zh:"给你。不过别加太多哦！",ctx:"爸爸提醒",person:"👨|爸爸说"},
+    {en:"This cake is so yummy! Did you make it, Grandma?",zh:"这个蛋糕好好吃！是你做的吗，奶奶？",ctx:"品尝甜点",person:"👧|嘉禾说"},
+    {en:"Yes! I made it just for you!",zh:"是的！我专门为你做的！",ctx:"奶奶回答",person:"👵|奶奶说"},
+    {en:"You are the best cook in the world, Grandma!",zh:"奶奶，你是世界上最棒的厨师！",ctx:"夸奶奶",person:"👧|嘉禾说"},
+    {en:"Oh you are such a sweet girl!",zh:"你真是个甜心小丫头！",ctx:"奶奶开心",person:"👵|奶奶说"},
+    {en:"Mama, I ate all my vegetables today!",zh:"妈妈，我今天把蔬菜都吃完了！",ctx:"好习惯",person:"👧|嘉禾说"},
+    {en:"That is wonderful! Good job!",zh:"太棒了！真乖！",ctx:"妈妈表扬",person:"👩|妈妈说"},
+    {en:"Can I have a biscuit as a snack?",zh:"我可以吃一块饼干当零食吗？",ctx:"下午茶",person:"👧|嘉禾说"},
+    {en:"Yes, just one. Dinner is in an hour.",zh:"可以，就一块。一小时后就吃晚饭了。",ctx:"妈妈同意",person:"👩|妈妈说"}
+  ]},
+  {id:'play',emoji:'🎮',name:'玩耍游戏',color:'#F4A0B5',border:'#FFD0E0',bg:'#FFF5F8',badge:'50句',desc:'课余游戏玩耍',sentences:[
+    {en:"Let us play in the park! Can you come?",zh:"我们去公园玩吧！你能来吗？",ctx:"邀请朋友",person:"👧|嘉禾说"},
+    {en:"Yes! Let me ask my Mama first.",zh:"好的！让我先问妈妈。",ctx:"朋友回应",person:"👦|朋友说"},
+    {en:"What is your favourite toy?",zh:"你最喜欢的玩具是什么？",ctx:"聊天",person:"👧|嘉禾说"},
+    {en:"I love my toy blocks! I can build anything!",zh:"我喜欢积木！我可以搭任何东西！",ctx:"朋友回答",person:"👦|朋友说"},
+    {en:"Can I play with your toys?",zh:"我可以玩你的玩具吗？",ctx:"借玩具",person:"👧|嘉禾说"},
+    {en:"Sure! Let us play together!",zh:"当然！我们一起玩吧！",ctx:"朋友分享",person:"👦|朋友说"},
+    {en:"Ready, set, go! Race you to the tree!",zh:"预备，开始！比赛跑到那棵树！",ctx:"户外活动",person:"👧|嘉禾说"},
+    {en:"Wait for me! You are so fast!",zh:"等等我！你好快！",ctx:"朋友追赶",person:"👦|朋友说"},
+    {en:"Do you want to draw pictures with me?",zh:"你想和我一起画画吗？",ctx:"课余时间",person:"👧|嘉禾说"},
+    {en:"Yes! I will draw a rainbow and a unicorn!",zh:"好的！我要画彩虹和独角兽！",ctx:"朋友回应",person:"👦|朋友说"},
+    {en:"Can we play hide and seek?",zh:"我们可以玩捉迷藏吗？",ctx:"游戏时间",person:"👧|嘉禾说"},
+    {en:"Yes! I will count to ten. Ready or not!",zh:"好的！我来数到十。准备好了没有！",ctx:"朋友数数",person:"👦|朋友说"},
+    {en:"My kite is flying so high! Look!",zh:"我的风筝飞得好高！看！",ctx:"放风筝",person:"👧|嘉禾说"},
+    {en:"It is beautiful! Can I try flying it too?",zh:"好漂亮！我也可以试试飞吗？",ctx:"朋友请求",person:"👦|朋友说"},
+    {en:"Playtime is over. Come inside now.",zh:"玩耍时间结束了。进来吧。",ctx:"叫回家",person:"👩|妈妈说"},
+    {en:"Five more minutes please, Mama!",zh:"妈妈，再五分钟嘛！",ctx:"嘉禾撒娇",person:"👧|嘉禾说"},
+    {en:"I won the game! Yay!",zh:"我赢了！耶！",ctx:"游戏胜利",person:"👧|嘉禾说"},
+    {en:"Well done! You played really well today!",zh:"做得好！你今天玩得真好！",ctx:"朋友称赞",person:"👦|朋友说"},
+    {en:"Let us play with the water balloons!",zh:"我们来玩水气球吧！",ctx:"夏天游戏",person:"👧|嘉禾说"},
+    {en:"That sounds so fun! Let me fill one up!",zh:"听起来好有趣！让我充一个！",ctx:"朋友同意",person:"👦|朋友说"},
+    {en:"Can you teach me how to do a cartwheel?",zh:"你能教我怎么翻跟头吗？",ctx:"学技能",person:"👧|嘉禾说"},
+    {en:"Sure! Watch me first, then you try!",zh:"当然！先看我，然后你试试！",ctx:"朋友教导",person:"👦|朋友说"},
+    {en:"Do you want to build a sandcastle?",zh:"你想建沙堡吗？",ctx:"海边",person:"👧|嘉禾说"},
+    {en:"Yes! Let us make a really big one!",zh:"好的！我们建一个超级大的！",ctx:"朋友兴奋",person:"👦|朋友说"},
+    {en:"Let us play dress up! I will be a princess!",zh:"我们来扮演游戏！我来扮公主！",ctx:"角色扮演",person:"👧|嘉禾说"},
+    {en:"And I will be the dragon! Roar!",zh:"我来扮龙！吼！",ctx:"朋友配合",person:"👦|朋友说"},
+    {en:"Let us play board games tonight!",zh:"今晚我们来玩棋盘游戏吧！",ctx:"家庭娱乐",person:"👧|嘉禾说"},
+    {en:"Great idea! Let us play Snakes and Ladders!",zh:"好主意！我们玩蛇棋！",ctx:"爸爸同意",person:"👨|爸爸说"},
+    {en:"It is my turn! I rolled a six!",zh:"到我了！我摇到六！",ctx:"游戏中",person:"👧|嘉禾说"},
+    {en:"Lucky you! Move your piece forward!",zh:"你真幸运！把你的棋子往前移！",ctx:"游戏进行",person:"👨|爸爸说"},
+    {en:"Can we go to the playground after lunch?",zh:"午饭后可以去操场吗？",ctx:"请求外出",person:"👧|嘉禾说"},
+    {en:"Yes, if you finish your vegetables!",zh:"可以，如果你把蔬菜都吃完的话！",ctx:"妈妈条件",person:"👩|妈妈说"},
+    {en:"Deal! I will eat everything!",zh:"成交！我什么都吃！",ctx:"嘉禾同意",person:"👧|嘉禾说"},
+    {en:"Push me on the swings please!",zh:"请帮我推秋千！",ctx:"操场上",person:"👧|嘉禾说"},
+    {en:"Hold on tight! Here we go!",zh:"抓紧！出发了！",ctx:"爸爸推秋千",person:"👨|爸爸说"},
+    {en:"Higher! Push me higher, Papa!",zh:"更高！爸爸，推我更高！",ctx:"嘉禾兴奋",person:"👧|嘉禾说"},
+    {en:"That is high enough! Safety first!",zh:"够高了！安全第一！",ctx:"爸爸提醒",person:"👨|爸爸说"},
+    {en:"Let us play pretend shop! I am the shopkeeper!",zh:"我们来玩扮家家酒商店！我来当老板！",ctx:"角色扮演",person:"👧|嘉禾说"},
+    {en:"I would like to buy some apples please!",zh:"我想买一些苹果！",ctx:"朋友扮演",person:"👦|朋友说"},
+    {en:"That will be five dollars please!",zh:"请付五块钱！",ctx:"嘉禾收钱",person:"👧|嘉禾说"},
+    {en:"Do you want to jump rope with us?",zh:"你想和我们一起跳绳吗？",ctx:"邀请",person:"👧|嘉禾说"},
+    {en:"Yes please! I am good at jumping rope!",zh:"好的！我很会跳绳的！",ctx:"朋友同意",person:"👦|朋友说"},
+    {en:"One two three jump! You are doing great!",zh:"一二三跳！你做得很好！",ctx:"一起跳绳",person:"👧|嘉禾说"},
+    {en:"Let us make friendship bracelets!",zh:"我们来做友谊手环吧！",ctx:"手工活动",person:"👧|嘉禾说"},
+    {en:"What a great idea! I will use blue and pink!",zh:"好主意！我要用蓝色和粉色！",ctx:"朋友同意",person:"👦|朋友说"},
+    {en:"This is so much fun! I do not want to go home!",zh:"太好玩了！我不想回家！",ctx:"玩得开心",person:"👧|嘉禾说"},
+    {en:"We can play again tomorrow!",zh:"我们明天还可以再玩！",ctx:"朋友安慰",person:"👦|朋友说"},
+    {en:"Okay! Same time tomorrow?",zh:"好的！明天同一时间？",ctx:"约定",person:"👧|嘉禾说"},
+    {en:"Yes! It is a date! See you then!",zh:"好的！说定了！到时见！",ctx:"朋友确定",person:"👦|朋友说"},
+    {en:"Thank you for playing with me today!",zh:"谢谢你今天陪我玩！",ctx:"道别时",person:"👧|嘉禾说"},
+    {en:"Thank you too! It was so much fun!",zh:"也谢谢你！今天真的很好玩！",ctx:"朋友回应",person:"👦|朋友说"}
+  ]},
+  {id:'body',emoji:'💪',name:'身体健康',color:'#A8E6CF',border:'#C8F0DC',bg:'#F0FDF5',badge:'50句',desc:'健康身体日常',sentences:[
+    {en:"Time to brush your teeth! Top and bottom.",zh:"刷牙时间了！上面和下面都要刷。",ctx:"早晚刷牙",person:"👩|妈妈说"},
+    {en:"Okay! I will brush for two minutes.",zh:"好的！我刷两分钟。",ctx:"嘉禾回应",person:"👧|嘉禾说"},
+    {en:"I have a stomachache. It hurts here.",zh:"我肚子痛。这里很痛。",ctx:"身体不适",person:"👧|嘉禾说"},
+    {en:"Oh no! Have you been to the bathroom?",zh:"哦不！你上厕所了吗？",ctx:"妈妈关心",person:"👩|妈妈说"},
+    {en:"I have a headache. My head hurts a lot.",zh:"我头痛。我的头很痛。",ctx:"生病时",person:"👧|嘉禾说"},
+    {en:"Let me take your temperature.",zh:"让我量一下你的体温。",ctx:"妈妈检查",person:"👩|妈妈说"},
+    {en:"Do you need to see a doctor?",zh:"你需要看医生吗？",ctx:"关心询问",person:"👨|爸爸说"},
+    {en:"I think so. My throat is very sore.",zh:"我觉得需要。我喉咙很痛。",ctx:"嘉禾描述",person:"👧|嘉禾说"},
+    {en:"Take this medicine. You will feel better soon.",zh:"吃这个药。你很快会好起来的。",ctx:"医生叮嘱",person:"👩|妈妈说"},
+    {en:"It tastes bitter! Can I have some water?",zh:"很苦！我可以喝点水吗？",ctx:"吃药后",person:"👧|嘉禾说"},
+    {en:"Exercise every day to stay healthy!",zh:"每天运动保持健康！",ctx:"健康建议",person:"👨|爸爸说"},
+    {en:"I like jumping, running and swimming!",zh:"我喜欢跳、跑步和游泳！",ctx:"嘉禾回答",person:"👧|嘉禾说"},
+    {en:"Wash your hands before eating!",zh:"吃饭前洗手！",ctx:"卫生习惯",person:"👩|妈妈说"},
+    {en:"Yes, Mama! Soap and water, twenty seconds!",zh:"好的，妈妈！肥皂和水，二十秒！",ctx:"嘉禾知道",person:"👧|嘉禾说"},
+    {en:"Do not forget to wear your jacket. It is cold today!",zh:"别忘了穿外套。今天很冷！",ctx:"出门前",person:"👵|奶奶说"},
+    {en:"I am wearing it, Grandma! I will not get cold!",zh:"我穿着呢，奶奶！我不会着凉的！",ctx:"嘉禾回应",person:"👧|嘉禾说"},
+    {en:"Did you sleep enough last night?",zh:"你昨晚睡得够吗？",ctx:"早上关心",person:"👩|妈妈说"},
+    {en:"Yes! I slept nine hours. I feel great!",zh:"是的！我睡了九小时。我感觉很好！",ctx:"嘉禾回答",person:"👧|嘉禾说"},
+    {en:"Sit up straight! Good posture is important.",zh:"坐直！良好姿势很重要。",ctx:"做作业时",person:"👨|爸爸说"},
+    {en:"Sorry, Papa! I will sit up straight now.",zh:"对不起，爸爸！我现在坐直。",ctx:"嘉禾纠正",person:"👧|嘉禾说"},
+    {en:"My eyes are tired from reading. Can I rest?",zh:"看书看得眼睛累了。可以休息吗？",ctx:"看书后",person:"👧|嘉禾说"},
+    {en:"Of course! Look out the window for a while.",zh:"当然！往窗外看一会儿。",ctx:"妈妈建议",person:"👩|妈妈说"},
+    {en:"I sneezed! I think I have a cold.",zh:"我打喷嚏了！我觉得我感冒了。",ctx:"生病",person:"👧|嘉禾说"},
+    {en:"Let me check. Stay warm and drink lots of water.",zh:"让我检查一下。保暖，多喝水。",ctx:"妈妈处理",person:"👩|妈妈说"},
+    {en:"My knee hurts. I fell at school today.",zh:"我膝盖疼。我今天在学校摔倒了。",ctx:"受伤",person:"👧|嘉禾说"},
+    {en:"Let me clean it. Be more careful next time.",zh:"让我清洁一下。下次要小心。",ctx:"妈妈处理",person:"👩|妈妈说"},
+    {en:"I feel much better now. Thank you, Mama!",zh:"我现在好多了。谢谢你，妈妈！",ctx:"康复后",person:"👧|嘉禾说"},
+    {en:"I am glad! Remember to rest when you feel sick.",zh:"太好了！记住，生病的时候要休息。",ctx:"妈妈提醒",person:"👩|妈妈说"},
+    {en:"How many glasses of water should I drink a day?",zh:"我一天应该喝多少杯水？",ctx:"健康知识",person:"👧|嘉禾说"},
+    {en:"At least eight glasses! Water is very important.",zh:"至少八杯！水非常重要。",ctx:"爸爸回答",person:"👨|爸爸说"},
+    {en:"I will drink more water every day!",zh:"我每天都会多喝水！",ctx:"嘉禾决心",person:"👧|嘉禾说"},
+    {en:"That is great! Your body will thank you!",zh:"很好！你的身体会感谢你的！",ctx:"爸爸鼓励",person:"👨|爸爸说"},
+    {en:"Can we go swimming today? I love swimming!",zh:"我们今天去游泳吗？我喜欢游泳！",ctx:"运动请求",person:"👧|嘉禾说"},
+    {en:"Yes! Swimming is great exercise!",zh:"好的！游泳是很好的运动！",ctx:"爸爸同意",person:"👨|爸爸说"},
+    {en:"I can swim three laps now! Look at me!",zh:"我现在能游三圈了！看我！",ctx:"游泳成就",person:"👧|嘉禾说"},
+    {en:"Wow! You are getting so good!",zh:"哇！你越来越棒了！",ctx:"爸爸称赞",person:"👨|爸爸说"},
+    {en:"I do not want to go to sleep yet.",zh:"我还不想睡觉。",ctx:"睡前",person:"👧|嘉禾说"},
+    {en:"Children need lots of sleep to grow strong.",zh:"孩子需要充足的睡眠才能长得强壮。",ctx:"妈妈解释",person:"👩|妈妈说"},
+    {en:"Okay, I understand. Good night, Mama!",zh:"好的，我明白了。晚安，妈妈！",ctx:"嘉禾同意",person:"👧|嘉禾说"},
+    {en:"Good night, my darling. Sleep well!",zh:"晚安，宝贝。好好睡！",ctx:"妈妈道晚安",person:"👩|妈妈说"},
+    {en:"I want to be a doctor when I grow up!",zh:"我长大想当医生！",ctx:"梦想",person:"👧|嘉禾说"},
+    {en:"That is wonderful! Study hard and you can do it!",zh:"太棒了！好好学习，你一定能做到！",ctx:"爸爸鼓励",person:"👨|爸爸说"},
+    {en:"Doctors help sick people get better, right?",zh:"医生帮助生病的人康复，对吧？",ctx:"了解职业",person:"👧|嘉禾说"},
+    {en:"That is right! They are very important people.",zh:"对的！他们是非常重要的人。",ctx:"爸爸确认",person:"👨|爸爸说"},
+    {en:"I finished my ten jumping jacks! What is next?",zh:"我做完十个开合跳了！下面是什么？",ctx:"运动训练",person:"👧|嘉禾说"},
+    {en:"Now do ten squats! Keep going!",zh:"现在做十个深蹲！继续加油！",ctx:"爸爸指导",person:"👨|爸爸说"},
+    {en:"This is hard but I will not give up!",zh:"这很难但我不会放弃！",ctx:"坚持运动",person:"👧|嘉禾说"},
+    {en:"That is the spirit! Keep going!",zh:"对！就是这种精神！继续！",ctx:"爸爸加油",person:"👨|爸爸说"},
+    {en:"I did it! I finished all my exercises!",zh:"我做到了！我完成了所有运动！",ctx:"完成锻炼",person:"👧|嘉禾说"},
+    {en:"Amazing! You are getting stronger every day!",zh:"太厉害了！你每天都在变得更强壮！",ctx:"爸爸表扬",person:"👨|爸爸说"}
+  ]},
+  {id:'feelings',emoji:'😊',name:'情绪表达',color:'#FFE066',border:'#FFD080',bg:'#FFFAE0',badge:'50句',desc:'表达心情感受',sentences:[
+    {en:"I am so happy today! Everything is wonderful!",zh:"我今天好开心！一切都很美好！",ctx:"心情好",person:"👧|嘉禾说"},
+    {en:"That is great! What made you so happy?",zh:"太好了！什么让你这么开心？",ctx:"妈妈问",person:"👩|妈妈说"},
+    {en:"My teacher said my drawing was beautiful!",zh:"老师说我的画很漂亮！",ctx:"嘉禾分享",person:"👧|嘉禾说"},
+    {en:"That is wonderful! You worked so hard on it!",zh:"太棒了！你为那幅画付出了很多努力！",ctx:"妈妈称赞",person:"👩|妈妈说"},
+    {en:"I am feeling sad today. I miss my friend.",zh:"我今天有点难过。我想念我的朋友。",ctx:"想念朋友",person:"👧|嘉禾说"},
+    {en:"I understand. You can call her on the phone.",zh:"我明白。你可以打电话给她。",ctx:"妈妈安慰",person:"👩|妈妈说"},
+    {en:"I am scared of the thunder!",zh:"我害怕打雷！",ctx:"雷雨天气",person:"👧|嘉禾说"},
+    {en:"Do not worry. I am right here with you.",zh:"不用担心。我就在你身边。",ctx:"妈妈安慰",person:"👩|妈妈说"},
+    {en:"I am angry! It is not fair!",zh:"我生气了！这不公平！",ctx:"生气时",person:"👧|嘉禾说"},
+    {en:"Take a deep breath. Tell me what happened.",zh:"深呼吸。告诉我发生了什么。",ctx:"妈妈引导",person:"👩|妈妈说"},
+    {en:"I feel nervous about the test tomorrow.",zh:"我对明天的测验感到紧张。",ctx:"考试前",person:"👧|嘉禾说"},
+    {en:"You have studied hard. You will do great!",zh:"你努力学习了。你会做得很好的！",ctx:"爸爸鼓励",person:"👨|爸爸说"},
+    {en:"I feel excited! My birthday is coming!",zh:"我好兴奋！我的生日要来了！",ctx:"生日前",person:"👧|嘉禾说"},
+    {en:"Yes! We have a special surprise for you!",zh:"是的！我们为你准备了一个特别的惊喜！",ctx:"妈妈回应",person:"👩|妈妈说"},
+    {en:"I feel proud! I won first place!",zh:"我好自豪！我得了第一名！",ctx:"比赛获奖",person:"👧|嘉禾说"},
+    {en:"We are so proud of you! Well done!",zh:"我们为你感到骄傲！做得好！",ctx:"爸爸称赞",person:"👨|爸爸说"},
+    {en:"I feel lonely. Can you play with me?",zh:"我感到孤独。你可以陪我玩吗？",ctx:"孤独时",person:"👧|嘉禾说"},
+    {en:"Of course! Let us do something fun together!",zh:"当然！我们一起做些有趣的事情！",ctx:"妈妈陪伴",person:"👩|妈妈说"},
+    {en:"I feel embarrassed. I made a mistake.",zh:"我感到很不好意思。我犯了一个错误。",ctx:"犯错后",person:"👧|嘉禾说"},
+    {en:"Everyone makes mistakes. That is how we learn.",zh:"每个人都会犯错。这是我们学习的方式。",ctx:"爸爸安慰",person:"👨|爸爸说"},
+    {en:"I feel surprised! I did not expect this gift!",zh:"我好惊喜！我没想到会有这个礼物！",ctx:"收到礼物",person:"👧|嘉禾说"},
+    {en:"Happy birthday! Do you like it?",zh:"生日快乐！你喜欢吗？",ctx:"爸爸问",person:"👨|爸爸说"},
+    {en:"I love it so much! Thank you!",zh:"我非常喜欢！谢谢！",ctx:"嘉禾感谢",person:"👧|嘉禾说"},
+    {en:"I feel worried. What if I do not like my new school?",zh:"我有点担心。如果我不喜欢新学校怎么办？",ctx:"换学校",person:"👧|嘉禾说"},
+    {en:"You will make new friends very quickly!",zh:"你会很快交到新朋友的！",ctx:"妈妈鼓励",person:"👩|妈妈说"},
+    {en:"How are you feeling today?",zh:"你今天感觉怎么样？",ctx:"关心问候",person:"👩|妈妈说"},
+    {en:"I feel happy and energetic!",zh:"我感觉开心又有活力！",ctx:"嘉禾回答",person:"👧|嘉禾说"},
+    {en:"I feel tired. I need a rest.",zh:"我感觉累了。我需要休息。",ctx:"疲惫时",person:"👧|嘉禾说"},
+    {en:"Go take a nap. You will feel better after.",zh:"去睡个午觉吧。醒来会好一些。",ctx:"妈妈建议",person:"👩|妈妈说"},
+    {en:"I feel confused. I do not understand this.",zh:"我感到困惑。我不明白这个。",ctx:"学习时",person:"👧|嘉禾说"},
+    {en:"Let me help you. We will figure it out together.",zh:"让我帮你。我们一起来想办法。",ctx:"爸爸帮忙",person:"👨|爸爸说"},
+    {en:"I feel grateful for my wonderful family.",zh:"我很感激有这么好的家人。",ctx:"感恩",person:"👧|嘉禾说"},
+    {en:"We feel grateful for you too, sweetheart!",zh:"我们也很感激有你，亲爱的！",ctx:"爸妈回应",person:"👩|妈妈说"},
+    {en:"Sometimes I feel shy when I meet new people.",zh:"遇见新朋友时我有时会感到害羞。",ctx:"社交",person:"👧|嘉禾说"},
+    {en:"That is okay! Just say hello and smile!",zh:"没关系！打个招呼，微微笑就好！",ctx:"妈妈建议",person:"👩|妈妈说"},
+    {en:"I feel much better after talking to you, Mama.",zh:"和你说话之后，我感觉好多了，妈妈。",ctx:"倾诉后",person:"👧|嘉禾说"},
+    {en:"I am always here for you. You can tell me anything.",zh:"我永远都在。你什么都可以告诉我。",ctx:"妈妈承诺",person:"👩|妈妈说"},
+    {en:"I feel calm now. The storm has passed.",zh:"我现在平静了。风暴过去了。",ctx:"情绪平复",person:"👧|嘉禾说"},
+    {en:"Good. Remember, it is okay to feel all kinds of feelings.",zh:"很好。记住，有各种各样的感受都是正常的。",ctx:"爸爸教导",person:"👨|爸爸说"},
+    {en:"I feel curious. How do birds fly?",zh:"我感到好奇。鸟儿是怎么飞的？",ctx:"好奇心",person:"👧|嘉禾说"},
+    {en:"Great question! Let us look it up together!",zh:"好问题！我们一起去查一查！",ctx:"爸爸引导",person:"👨|爸爸说"},
+    {en:"I feel disappointed. I did not win the race.",zh:"我感到失望。我没有赢得比赛。",ctx:"比赛失败",person:"👧|嘉禾说"},
+    {en:"It is okay to feel disappointed. You tried your best!",zh:"感到失望是正常的。你已经尽力了！",ctx:"妈妈安慰",person:"👩|妈妈说"},
+    {en:"You are right. I will try again next time!",zh:"你说得对。我下次会再试的！",ctx:"嘉禾振作",person:"👧|嘉禾说"},
+    {en:"That is the spirit! Never give up!",zh:"对！就是这种精神！永不放弃！",ctx:"妈妈鼓励",person:"👩|妈妈说"},
+    {en:"I feel peaceful when I look at the stars.",zh:"看星星的时候我感到很宁静。",ctx:"夜晚",person:"👧|嘉禾说"},
+    {en:"Me too. The sky is so beautiful at night.",zh:"我也是。夜晚的天空真美。",ctx:"爸爸同感",person:"👨|爸爸说"},
+    {en:"I feel brave today! I am not scared at all!",zh:"我今天感觉很勇敢！我一点都不害怕！",ctx:"勇敢",person:"👧|嘉禾说"},
+    {en:"That is wonderful! Bravery takes practice!",zh:"太棒了！勇气需要练习！",ctx:"爸爸赞扬",person:"👨|爸爸说"},
+    {en:"Mama, talking about my feelings always helps.",zh:"妈妈，说出自己的感受总是有帮助的。",ctx:"总结",person:"👧|嘉禾说"},
+    {en:"Yes! Always share your feelings. I am here to listen.",zh:"是的！随时分享你的感受。我在这里聆听。",ctx:"妈妈承诺",person:"👩|妈妈说"}
+  ]},
+  {id:'nature',emoji:'🌿',name:'大自然',color:'#B5D5B0',border:'#C8EAC0',bg:'#F0FDF0',badge:'50句',desc:'探索大自然',sentences:[
+    {en:"Look at that beautiful butterfly!",zh:"看那只漂亮的蝴蝶！",ctx:"户外",person:"👧|嘉禾说"},
+    {en:"Wow! It has such pretty wings!",zh:"哇！它的翅膀好漂亮！",ctx:"爸爸回应",person:"👨|爸爸说"},
+    {en:"Why do flowers have so many colours?",zh:"为什么花有这么多颜色？",ctx:"好奇心",person:"👧|嘉禾说"},
+    {en:"To attract butterflies and bees!",zh:"为了吸引蝴蝶和蜜蜂！",ctx:"妈妈解释",person:"👩|妈妈说"},
+    {en:"Can I pick some flowers for you, Mama?",zh:"我可以摘些花给你吗，妈妈？",ctx:"表达爱意",person:"👧|嘉禾说"},
+    {en:"How sweet! Yes, but be careful of thorns.",zh:"真甜心！好的，但要小心刺。",ctx:"妈妈同意",person:"👩|妈妈说"},
+    {en:"It is raining! Let us dance in the rain!",zh:"下雨了！我们在雨里跳舞吧！",ctx:"下雨天",person:"👧|嘉禾说"},
+    {en:"Ha! Okay but put on your boots first!",zh:"哈！好吧，但先穿上靴子！",ctx:"爸爸同意",person:"👨|爸爸说"},
+    {en:"Look! A rainbow! It is so beautiful!",zh:"看！彩虹！好漂亮！",ctx:"雨后",person:"👧|嘉禾说"},
+    {en:"How many colours can you see?",zh:"你能看到几种颜色？",ctx:"爸爸提问",person:"👨|爸爸说"},
+    {en:"Red, orange, yellow, green, blue, purple! Seven!",zh:"红、橙、黄、绿、蓝、紫！七种！",ctx:"嘉禾数颜色",person:"👧|嘉禾说"},
+    {en:"Perfect! You know all the rainbow colours!",zh:"棒极了！你知道所有彩虹颜色！",ctx:"爸爸称赞",person:"👨|爸爸说"},
+    {en:"Why do leaves fall from trees in autumn?",zh:"为什么秋天树叶会落下来？",ctx:"秋天",person:"👧|嘉禾说"},
+    {en:"The trees sleep in winter and save energy.",zh:"树木在冬天休眠，储存能量。",ctx:"爸爸解释",person:"👨|爸爸说"},
+    {en:"I love jumping in the pile of leaves!",zh:"我喜欢跳进落叶堆里！",ctx:"秋天玩耍",person:"👧|嘉禾说"},
+    {en:"Me too! Watch out, here I come!",zh:"我也是！小心，我来了！",ctx:"爸爸一起玩",person:"👨|爸爸说"},
+    {en:"Look at all the stars! There are so many!",zh:"看所有的星星！有好多！",ctx:"夜晚",person:"👧|嘉禾说"},
+    {en:"Can you find the Big Dipper?",zh:"你能找到北斗七星吗？",ctx:"爸爸提问",person:"👨|爸爸说"},
+    {en:"I can see the moon so clearly tonight!",zh:"今晚我能清楚地看到月亮！",ctx:"月圆之夜",person:"👧|嘉禾说"},
+    {en:"Yes! It is a full moon tonight.",zh:"是的！今晚是满月。",ctx:"爸爸说明",person:"👨|爸爸说"},
+    {en:"I want to plant a seed and grow a flower!",zh:"我想种一颗种子，种出一朵花！",ctx:"园艺",person:"👧|嘉禾说"},
+    {en:"Great idea! Let us get some soil and a pot.",zh:"好主意！我们去拿些土和花盆。",ctx:"爸爸同意",person:"👨|爸爸说"},
+    {en:"I watered my plant today! It is growing!",zh:"我今天给我的植物浇水了！它在生长！",ctx:"照顾植物",person:"👧|嘉禾说"},
+    {en:"Well done! Plants need love and care like us!",zh:"做得好！植物像我们一样需要爱和照顾！",ctx:"妈妈鼓励",person:"👩|妈妈说"},
+    {en:"There are so many ants here! Where are they going?",zh:"这里有好多蚂蚁！它们要去哪里？",ctx:"观察昆虫",person:"👧|嘉禾说"},
+    {en:"They are carrying food back to their home!",zh:"它们在把食物带回家！",ctx:"爸爸解释",person:"👨|爸爸说"},
+    {en:"Ants are so strong! They can carry ten times their weight!",zh:"蚂蚁真厉害！能搬自身重量十倍的东西！",ctx:"嘉禾惊叹",person:"👧|嘉禾说"},
+    {en:"That is right! Ants are amazing little creatures.",zh:"对的！蚂蚁是令人惊叹的小生物。",ctx:"爸爸确认",person:"👨|爸爸说"},
+    {en:"I hear birds singing! What kind of bird is that?",zh:"我听到鸟儿在唱歌！那是什么鸟？",ctx:"听鸟鸣",person:"👧|嘉禾说"},
+    {en:"That sounds like a sparrow! They are very common.",zh:"听起来像麻雀！它们很常见。",ctx:"爸爸识别",person:"👨|爸爸说"},
+    {en:"The sea is so blue! I want to swim in it!",zh:"海是那么蓝！我想在里面游泳！",ctx:"海边",person:"👧|嘉禾说"},
+    {en:"The water is a bit cold. Are you sure?",zh:"水有点冷。你确定吗？",ctx:"爸爸询问",person:"👨|爸爸说"},
+    {en:"Yes! Cold water is exciting!",zh:"是的！冷水很刺激！",ctx:"嘉禾兴奋",person:"👧|嘉禾说"},
+    {en:"I found a snail! Look at its shell!",zh:"我找到了一只蜗牛！看它的壳！",ctx:"发现小动物",person:"👧|嘉禾说"},
+    {en:"Beautiful! The spiral pattern is amazing.",zh:"真美！螺旋图案太神奇了。",ctx:"妈妈欣赏",person:"👩|妈妈说"},
+    {en:"Should we put it back in the garden?",zh:"我们应该把它放回花园吗？",ctx:"保护动物",person:"👧|嘉禾说"},
+    {en:"Yes, that is the right thing to do.",zh:"是的，那是正确的做法。",ctx:"妈妈肯定",person:"👩|妈妈说"},
+    {en:"I love the smell of rain on the ground!",zh:"我喜欢雨落在地上的气味！",ctx:"下雨后",person:"👧|嘉禾说"},
+    {en:"That smell has a special name. It is called petrichor!",zh:"那种气味有个特别的名字，叫泥土气息！",ctx:"爸爸介绍",person:"👨|爸爸说"},
+    {en:"Wow! Everything in nature has a name!",zh:"哇！大自然中的一切都有名字！",ctx:"嘉禾感叹",person:"👧|嘉禾说"},
+    {en:"Yes! And there is so much more to discover!",zh:"是的！还有更多等待发现！",ctx:"爸爸鼓励",person:"👨|爸爸说"},
+    {en:"We should protect nature and keep it clean.",zh:"我们应该保护自然，保持清洁。",ctx:"环保意识",person:"👧|嘉禾说"},
+    {en:"Absolutely! Never litter. Pick up rubbish too.",zh:"当然！永远不要乱扔垃圾。还要捡垃圾。",ctx:"妈妈支持",person:"👩|妈妈说"},
+    {en:"I picked up three pieces of litter today!",zh:"我今天捡了三块垃圾！",ctx:"做好事",person:"👧|嘉禾说"},
+    {en:"That is wonderful! You are helping the Earth!",zh:"太棒了！你在帮助地球！",ctx:"妈妈称赞",person:"👩|妈妈说"},
+    {en:"The sunset is so pretty! All pink and orange!",zh:"夕阳好漂亮！粉红色和橙色！",ctx:"傍晚",person:"👧|嘉禾说"},
+    {en:"Every sunset is different. This one is special.",zh:"每次日落都不同。这次特别美。",ctx:"爸爸感叹",person:"👨|爸爸说"},
+    {en:"Nature is the most beautiful thing in the world.",zh:"大自然是世界上最美丽的东西。",ctx:"感叹",person:"👧|嘉禾说"},
+    {en:"I agree! Let us always appreciate and protect it.",zh:"我同意！让我们永远欣赏和保护它。",ctx:"爸爸总结",person:"👨|爸爸说"},
+    {en:"I want to be a nature explorer when I grow up!",zh:"我长大想成为一名自然探险家！",ctx:"梦想",person:"👧|嘉禾说"},
+    {en:"You already are one! You are always so curious!",zh:"你已经是了！你总是那么充满好奇心！",ctx:"爸爸鼓励",person:"👨|爸爸说"}
+  ]}
+];
+
+var CHINESE_THEMES = [
+  {id:'nature_w',name:'春夏秋冬',emoji:'🌸',color:'#A8E6CF',border:'#B8EDCE',chars:[
+    {c:'春',p:'chūn',mean:'春天',words:['春天','春风','春雨']},
+    {c:'夏',p:'xià',mean:'夏天',words:['夏天','夏日','夏季']},
+    {c:'秋',p:'qiū',mean:'秋天',words:['秋天','秋风','秋叶']},
+    {c:'冬',p:'dōng',mean:'冬天',words:['冬天','冬雪','冬日']},
+    {c:'雪',p:'xuě',mean:'雪',words:['下雪','雪花','雪白']},
+    {c:'风',p:'fēng',mean:'风',words:['风吹','春风','大风']},
+    {c:'雨',p:'yǔ',mean:'雨',words:['下雨','雨水','雨点']},
+    {c:'花',p:'huā',mean:'花',words:['花朵','花园','红花']},
+    {c:'草',p:'cǎo',mean:'草',words:['草地','小草','草绿']},
+    {c:'树',p:'shù',mean:'树',words:['大树','树叶','树木']}
+  ]},
+  {id:'family_w',name:'家人亲情',emoji:'👨‍👩‍👧',color:'#FFB5A7',border:'#FFD0C0',chars:[
+    {c:'爸',p:'bà',mean:'爸爸',words:['爸爸','好爸爸']},
+    {c:'妈',p:'mā',mean:'妈妈',words:['妈妈','好妈妈']},
+    {c:'爷',p:'yé',mean:'爷爷',words:['爷爷','老爷爷']},
+    {c:'奶',p:'nǎi',mean:'奶奶',words:['奶奶','好奶奶']},
+    {c:'哥',p:'gē',mean:'哥哥',words:['哥哥','大哥哥']},
+    {c:'姐',p:'jiě',mean:'姐姐',words:['姐姐','小姐姐']},
+    {c:'弟',p:'dì',mean:'弟弟',words:['弟弟','小弟弟']},
+    {c:'妹',p:'mèi',mean:'妹妹',words:['妹妹','小妹妹']},
+    {c:'家',p:'jiā',mean:'家',words:['家人','回家','我家']},
+    {c:'爱',p:'ài',mean:'爱',words:['爱心','爱护','可爱']}
+  ]},
+  {id:'school_w',name:'学校学习',emoji:'✏️',color:'#A8D8EA',border:'#B8E0F0',chars:[
+    {c:'书',p:'shū',mean:'书',words:['书本','书包','图书']},
+    {c:'学',p:'xué',mean:'学习',words:['学习','学校','同学']},
+    {c:'老',p:'lǎo',mean:'老师',words:['老师','老人','老大']},
+    {c:'师',p:'shī',mean:'老师',words:['老师','教师','师傅']},
+    {c:'同',p:'tóng',mean:'同学',words:['同学','同班','相同']},
+    {c:'写',p:'xiě',mean:'写字',words:['写字','写作','书写']},
+    {c:'读',p:'dú',mean:'读书',words:['读书','朗读','阅读']},
+    {c:'画',p:'huà',mean:'画画',words:['画画','图画','画家']},
+    {c:'玩',p:'wán',mean:'玩耍',words:['玩耍','好玩','玩具']},
+    {c:'做',p:'zuò',mean:'做事',words:['做作业','做饭','做事']}
+  ]},
+  {id:'animals_w',name:'可爱动物',emoji:'🐼',color:'#C9B8E8',border:'#D8C8F0',chars:[
+    {c:'猫',p:'māo',mean:'猫',words:['小猫','猫咪','花猫']},
+    {c:'狗',p:'gǒu',mean:'狗',words:['小狗','大狗','好狗']},
+    {c:'鱼',p:'yú',mean:'鱼',words:['小鱼','金鱼','鱼儿']},
+    {c:'鸟',p:'niǎo',mean:'鸟',words:['小鸟','鸟儿','飞鸟']},
+    {c:'兔',p:'tù',mean:'兔子',words:['兔子','小兔','白兔']},
+    {c:'马',p:'mǎ',mean:'马',words:['大马','马儿','白马']},
+    {c:'牛',p:'niú',mean:'牛',words:['牛儿','小牛','黄牛']},
+    {c:'羊',p:'yáng',mean:'羊',words:['小羊','白羊','山羊']},
+    {c:'熊',p:'xióng',mean:'熊',words:['熊猫','大熊','小熊']},
+    {c:'虎',p:'hǔ',mean:'老虎',words:['老虎','小虎','虎年']}
+  ]},
+  {id:'food_w',name:'美食食物',emoji:'🍎',color:'#FFB347',border:'#FFC870',chars:[
+    {c:'饭',p:'fàn',mean:'吃饭',words:['吃饭','米饭','饭碗']},
+    {c:'水',p:'shuǐ',mean:'水',words:['水果','喝水','水花']},
+    {c:'果',p:'guǒ',mean:'水果',words:['水果','果汁','苹果']},
+    {c:'肉',p:'ròu',mean:'肉',words:['肉肉','鸡肉','猪肉']},
+    {c:'米',p:'mǐ',mean:'米饭',words:['米饭','白米','大米']},
+    {c:'面',p:'miàn',mean:'面条',words:['面条','面包','方面']},
+    {c:'蛋',p:'dàn',mean:'鸡蛋',words:['鸡蛋','蛋糕','彩蛋']},
+    {c:'菜',p:'cài',mean:'蔬菜',words:['蔬菜','白菜','买菜']},
+    {c:'甜',p:'tián',mean:'甜',words:['甜甜','甜蜜','香甜']},
+    {c:'香',p:'xiāng',mean:'香',words:['香香','香气','花香']}
+  ]},
+  {id:'body_w',name:'身体部位',emoji:'🫀',color:'#F4A0B5',border:'#FFB8C8',chars:[
+    {c:'头',p:'tóu',mean:'头',words:['头发','点头','头脑']},
+    {c:'眼',p:'yǎn',mean:'眼睛',words:['眼睛','眼镜','眼泪']},
+    {c:'耳',p:'ěr',mean:'耳朵',words:['耳朵','耳环','木耳']},
+    {c:'鼻',p:'bí',mean:'鼻子',words:['鼻子','鼻涕','鼻音']},
+    {c:'嘴',p:'zuǐ',mean:'嘴巴',words:['嘴巴','嘴唇','开口']},
+    {c:'手',p:'shǒu',mean:'手',words:['手心','手指','握手']},
+    {c:'脚',p:'jiǎo',mean:'脚',words:['脚步','脚印','小脚']},
+    {c:'心',p:'xīn',mean:'心',words:['心形','开心','爱心']},
+    {c:'背',p:'bèi',mean:'背',words:['背包','背书','背后']},
+    {c:'肚',p:'dù',mean:'肚子',words:['肚子','肚脐','大肚']}
+  ]}
+];
+
+var PICTURE_STORIES = [
+  {id:1,emoji:'🌅',title:'春天来了',scene:'春天到了，小朋友们在公园里玩耍。公园里开满了五颜六色的花，小鸟在枝头唱歌，小朋友们有的荡秋千，有的踢足球，有的放风筝。',
+   questions:[
+     {q:'这是什么季节？',opts:['春天','夏天','秋天','冬天'],ans:0},
+     {q:'小鸟在哪里唱歌？',opts:['树上','地上','水里','天上'],ans:0},
+     {q:'公园里的花是什么样的？',opts:['只有红色','只有白色','五颜六色','没有花'],ans:2}
+   ],
+   words:['春天','公园','花朵','小鸟','风筝'],
+   desc:'请看图，用几句话说说画面里有什么？'},
+  {id:2,emoji:'🏫',title:'我爱我的学校',scene:'学校里，同学们认真地上课。教室里摆放着整齐的桌椅，黑板上写着老师的字，同学们举起手来回答问题，教室外面的操场上有同学们课间玩耍的身影。',
+   questions:[
+     {q:'同学们在哪里上课？',opts:['家里','公园里','教室里','图书馆'],ans:2},
+     {q:'黑板上有什么？',opts:['画','老师写的字','照片','没有东西'],ans:1},
+     {q:'课间同学们在哪里玩？',opts:['教室里','操场上','家里','公园里'],ans:1}
+   ],
+   words:['学校','教室','同学','老师','课间'],
+   desc:'你喜欢学校的什么地方？说说你的学校。'},
+  {id:3,emoji:'🌧️',title:'下雨天',scene:'今天下雨了，小朋友撑着彩色的雨伞，穿着黄色的雨靴，踩着水坑，溅起了水花。路边的花草经过雨水的滋润，显得更加翠绿。天上的乌云慢慢散开，露出了一道美丽的彩虹。',
+   questions:[
+     {q:'小朋友撑的雨伞是什么样的？',opts:['黑色','彩色','白色','没有伞'],ans:1},
+     {q:'雨后天空出现了什么？',opts:['太阳','月亮','彩虹','星星'],ans:2},
+     {q:'雨水让花草变成了什么样？',opts:['枯萎了','更翠绿','变黄了','没变化'],ans:1}
+   ],
+   words:['下雨','雨伞','雨靴','水坑','彩虹'],
+   desc:'你喜欢下雨天吗？下雨天你会做什么？'},
+  {id:4,emoji:'🎂',title:'生日快乐',scene:'今天是小明的生日。妈妈在家里准备了一个大蛋糕，蛋糕上插着七根蜡烛，因为小明今年七岁了。小明的好朋友们都来了，大家一起唱生日歌，小明许了一个愿望，深吸一口气，把蜡烛全部吹灭了！',
+   questions:[
+     {q:'蛋糕上有几根蜡烛？',opts:['五根','六根','七根','八根'],ans:2},
+     {q:'小明今年几岁？',opts:['五岁','六岁','七岁','八岁'],ans:2},
+     {q:'大家一起做了什么？',opts:['跳舞','唱生日歌','画画','踢球'],ans:1}
+   ],
+   words:['生日','蛋糕','蜡烛','愿望','朋友'],
+   desc:'你的生日是怎么过的？你许过什么愿望？'},
+  {id:5,emoji:'🛒',title:'去超市',scene:'妈妈带着小花去超市购物。超市里的东西可真多，有各种各样的蔬菜和水果，还有面包、牛奶。小花帮妈妈推着购物车，认真地帮妈妈找东西。结账的时候，小花还帮妈妈把东西放在收银台上。',
+   questions:[
+     {q:'妈妈带谁去超市？',opts:['小明','小花','小强','小红'],ans:1},
+     {q:'小花帮妈妈做了什么？',opts:['什么都没做','推购物车','付钱','开车'],ans:1},
+     {q:'超市里有什么？',opts:['只有蔬菜','只有水果','各种各样的东西','只有玩具'],ans:2}
+   ],
+   words:['超市','购物','蔬菜','水果','帮忙'],
+   desc:'你帮过家人做过什么事情？说说你是怎么帮忙的。'}
+];
+
+var POEMS = [
+  {title:"静夜思",author:"李白（唐）",grade:"一年级",lines:[
+    {hz:"床前明月光，",py:"chuáng qián míng yuè guāng"},
+    {hz:"疑是地上霜。",py:"yí shì dì shàng shuāng"},
+    {hz:"举头望明月，",py:"jǔ tóu wàng míng yuè"},
+    {hz:"低头思故乡。",py:"dī tóu sī gù xiāng"}
+  ],meaning:"明亮的月光洒在床前，好像是地上铺了一层白霜。诗人抬头望着明月，低头思念远方的家乡。"},
+  {title:"春晓",author:"孟浩然（唐）",grade:"一年级",lines:[
+    {hz:"春眠不觉晓，",py:"chūn mián bù jué xiǎo"},
+    {hz:"处处闻啼鸟。",py:"chù chù wén tí niǎo"},
+    {hz:"夜来风雨声，",py:"yè lái fēng yǔ shēng"},
+    {hz:"花落知多少。",py:"huā luò zhī duō shǎo"}
+  ],meaning:"春天睡觉不知不觉天亮了，到处都能听到鸟儿在叫。想起昨夜风雨声声，不知道有多少花儿已经凋落。"},
+  {title:"悯农",author:"李绅（唐）",grade:"一年级",lines:[
+    {hz:"锄禾日当午，",py:"chú hé rì dāng wǔ"},
+    {hz:"汗滴禾下土。",py:"hàn dī hé xià tǔ"},
+    {hz:"谁知盘中餐，",py:"shuí zhī pán zhōng cān"},
+    {hz:"粒粒皆辛苦。",py:"lì lì jiē xīn kǔ"}
+  ],meaning:"农民在正午烈日的暴晒下锄草，汗水滴落在禾苗下的泥土里。有谁知道盘中的饭食，每一粒都是这样辛苦来的呢？"},
+  {title:"咏鹅",author:"骆宾王（唐）",grade:"一年级",lines:[
+    {hz:"鹅鹅鹅，",py:"é é é"},
+    {hz:"曲项向天歌。",py:"qū xiàng xiàng tiān gē"},
+    {hz:"白毛浮绿水，",py:"bái máo fú lǜ shuǐ"},
+    {hz:"红掌拨清波。",py:"hóng zhǎng bō qīng bō"}
+  ],meaning:"白鹅啊白鹅，弯曲着脖子仰天高歌。洁白的羽毛漂浮在碧绿的水面上，红色的脚掌拨动着清澈的水波。"},
+  {title:"登鹳雀楼",author:"王之涣（唐）",grade:"一年级",lines:[
+    {hz:"白日依山尽，",py:"bái rì yī shān jìn"},
+    {hz:"黄河入海流。",py:"huáng hé rù hǎi liú"},
+    {hz:"欲穷千里目，",py:"yù qióng qiān lǐ mù"},
+    {hz:"更上一层楼。",py:"gèng shàng yī céng lóu"}
+  ],meaning:"夕阳沿着山脉慢慢落下，黄河向大海奔流而去。想要看到更远的风景，就要再登高一层楼。"},
+  {title:"相思",author:"王维（唐）",grade:"二年级",lines:[
+    {hz:"红豆生南国，",py:"hóng dòu shēng nán guó"},
+    {hz:"春来发几枝。",py:"chūn lái fā jǐ zhī"},
+    {hz:"愿君多采撷，",py:"yuàn jūn duō cǎi xié"},
+    {hz:"此物最相思。",py:"cǐ wù zuì xiāng sī"}
+  ],meaning:"红豆生长在南方，春天来了它会长出多少新枝？希望你多采摘一些，因为它最能寄托相思之情。"},
+  {title:"古朗月行",author:"李白（唐）",grade:"一年级",lines:[
+    {hz:"小时不识月，",py:"xiǎo shí bù shí yuè"},
+    {hz:"呼作白玉盘。",py:"hū zuò bái yù pán"},
+    {hz:"又疑瑶台镜，",py:"yòu yí yáo tái jìng"},
+    {hz:"飞在青云端。",py:"fēi zài qīng yún duān"}
+  ],meaning:"小时候不认识月亮，叫它做白玉盘。又以为是瑶台仙镜，飞在青云之上。"},
+  {title:"梅花",author:"王安石（宋）",grade:"二年级",lines:[
+    {hz:"墙角数枝梅，",py:"qiáng jiǎo shù zhī méi"},
+    {hz:"凌寒独自开。",py:"líng hán dú zì kāi"},
+    {hz:"遥知不是雪，",py:"yáo zhī bù shì xuě"},
+    {hz:"为有暗香来。",py:"wèi yǒu àn xiāng lái"}
+  ],meaning:"墙角有几枝梅花，顶着严寒独自开放。远远看去知道那不是雪，因为有阵阵幽香飘来。"},
+  {title:"山行",author:"杜牧（唐）",grade:"二年级",lines:[
+    {hz:"远上寒山石径斜，",py:"yuǎn shàng hán shān shí jìng xié"},
+    {hz:"白云生处有人家。",py:"bái yún shēng chù yǒu rén jiā"},
+    {hz:"停车坐爱枫林晚，",py:"tíng chē zuò ài fēng lín wǎn"},
+    {hz:"霜叶红于二月花。",py:"shuāng yè hóng yú èr yuè huā"}
+  ],meaning:"弯曲的石头小路远远地伸向寒冷的山顶，白云升起的地方隐隐约约有几户人家。停下车来，是因为喜爱傍晚枫林的美景，那经霜的枫叶竟比二月的鲜花还要红艳。"},
+  {title:"绝句",author:"杜甫（唐）",grade:"二年级",lines:[
+    {hz:"两个黄鹂鸣翠柳，",py:"liǎng gè huáng lí míng cuì liǔ"},
+    {hz:"一行白鹭上青天。",py:"yī xíng bái lù shàng qīng tiān"},
+    {hz:"窗含西岭千秋雪，",py:"chuāng hán xī lǐng qiān qiū xuě"},
+    {hz:"门泊东吴万里船。",py:"mén bó dōng wú wàn lǐ chuán"}
+  ],meaning:"两只黄鹂在翠绿的柳树间鸣叫，一行白鹭直冲青天。窗外是西岭上千年不化的积雪，门前停着来自万里之外的东吴大船。"},
+  {title:"望庐山瀑布",author:"李白（唐）",grade:"二年级",lines:[
+    {hz:"日照香炉生紫烟，",py:"rì zhào xiāng lú shēng zǐ yān"},
+    {hz:"遥看瀑布挂前川。",py:"yáo kàn pù bù guà qián chuān"},
+    {hz:"飞流直下三千尺，",py:"fēi liú zhí xià sān qiān chǐ"},
+    {hz:"疑是银河落九天。",py:"yí shì yín hé luò jiǔ tiān"}
+  ],meaning:"阳光照耀香炉峰生起了紫色的烟雾，远远望去瀑布像一条白练挂在山前。飞快的水流从高处直冲而下，让人怀疑是银河从天上落下来。"},
+  {title:"村居",author:"高鼎（清）",grade:"一年级",lines:[
+    {hz:"草长莺飞二月天，",py:"cǎo zhǎng yīng fēi èr yuè tiān"},
+    {hz:"拂堤杨柳醉春烟。",py:"fú dī yáng liǔ zuì chūn yān"},
+    {hz:"儿童散学归来早，",py:"ér tóng sàn xué guī lái zǎo"},
+    {hz:"忙趁东风放纸鸢。",py:"máng chèn dōng fēng fàng zhǐ yuān"}
+  ],meaning:"农历二月，小草长出来了，黄莺在天空中飞翔，杨柳拂堤，春天的烟雾让人陶醉。孩子们放学后早早回来，赶紧趁着东风放风筝。"},
+  {title:"所见",author:"袁枚（清）",grade:"一年级",lines:[
+    {hz:"牧童骑黄牛，",py:"mù tóng qí huáng niú"},
+    {hz:"歌声振林樾。",py:"gē shēng zhèn lín yuè"},
+    {hz:"意欲捕鸣蝉，",py:"yì yù bǔ míng chán"},
+    {hz:"忽然闭口立。",py:"hū rán bì kǒu lì"}
+  ],meaning:"牧童骑着黄牛，嘹亮的歌声响彻林间。他大概是想抓住那正在鸣叫的蝉，所以忽然停止唱歌，一声不响地站立在树旁。"},
+  {title:"小儿垂钓",author:"胡令能（唐）",grade:"二年级",lines:[
+    {hz:"蓬头稚子学垂纶，",py:"péng tóu zhì zǐ xué chuí lún"},
+    {hz:"侧坐莓苔草映身。",py:"cè zuò méi tái cǎo yìng shēn"},
+    {hz:"路人借问遥招手，",py:"lù rén jiè wèn yáo zhāo shǒu"},
+    {hz:"怕得鱼惊不应人。",py:"pà dé yú jīng bù yìng rén"}
+  ],meaning:"一个头发蓬乱的小孩子正在学钓鱼，侧身坐在青苔上，草遮住了他的身影。路人向他问路，他远远地摆摆手，怕惊动鱼儿，不敢答话。"},
+  {title:"江南",author:"汉乐府",grade:"一年级",lines:[
+    {hz:"江南可采莲，",py:"jiāng nán kě cǎi lián"},
+    {hz:"莲叶何田田。",py:"lián yè hé tián tián"},
+    {hz:"鱼戏莲叶间，",py:"yú xì lián yè jiān"},
+    {hz:"鱼戏莲叶东，",py:"yú xì lián yè dōng"},
+    {hz:"鱼戏莲叶西。",py:"yú xì lián yè xī"}
+  ],meaning:"江南是采莲的好地方，荷叶多么茂盛。鱼儿在荷叶间嬉戏，一会儿游向东，一会儿游向西。"},
+  {title:"春日",author:"朱熹（宋）",grade:"二年级",lines:[
+    {hz:"胜日寻芳泗水滨，",py:"shèng rì xún fāng sì shuǐ bīn"},
+    {hz:"无边光景一时新。",py:"wú biān guāng jǐng yī shí xīn"},
+    {hz:"等闲识得东风面，",py:"děng xián shí dé dōng fēng miàn"},
+    {hz:"万紫千红总是春。",py:"wàn zǐ qiān hóng zǒng shì chūn"}
+  ],meaning:"在一个风和日丽的好天气，来到泗水旁寻找春天，无边无际的景象焕然一新。容易识得那春风的面貌，万紫千红都是春天的颜色。"},
+  {title:"赠刘景文",author:"苏轼（宋）",grade:"二年级",lines:[
+    {hz:"荷尽已无擎雨盖，",py:"hé jìn yǐ wú qíng yǔ gài"},
+    {hz:"菊残犹有傲霜枝。",py:"jú cán yóu yǒu ào shuāng zhī"},
+    {hz:"一年好景君须记，",py:"yī nián hǎo jǐng jūn xū jì"},
+    {hz:"最是橙黄橘绿时。",py:"zuì shì chéng huáng jú lǜ shí"}
+  ],meaning:"荷花凋谢连那擎雨的荷叶也枯萎了，只有那开败了的菊花的花枝还傲寒斗霜。你一定要记住一年中最美好的光景，那就是橙子金黄、橘子青绿的秋末冬初的时节啊。"},
+  {title:"夜书所见",author:"叶绍翁（宋）",grade:"二年级",lines:[
+    {hz:"萧萧梧叶送寒声，",py:"xiāo xiāo wú yè sòng hán shēng"},
+    {hz:"江上秋风动客情。",py:"jiāng shàng qiū fēng dòng kè qíng"},
+    {hz:"知有儿童挑促织，",py:"zhī yǒu ér tóng tiāo cù zhī"},
+    {hz:"夜深篱落一灯明。",py:"yè shēn lí luò yī dēng míng"}
+  ],meaning:"萧萧秋风吹动梧叶，送来阵阵寒意，客游在外的诗人不禁思念起自己的家乡。他忽然看到远处篱笆下的灯火，料想是孩子们在捉蟋蟀。"},
+  {title:"九月九日忆山东兄弟",author:"王维（唐）",grade:"二年级",lines:[
+    {hz:"独在异乡为异客，",py:"dú zài yì xiāng wéi yì kè"},
+    {hz:"每逢佳节倍思亲。",py:"měi féng jiā jié bèi sī qīn"},
+    {hz:"遥知兄弟登高处，",py:"yáo zhī xiōng dì dēng gāo chù"},
+    {hz:"遍插茱萸少一人。",py:"biàn chā zhū yú shǎo yī rén"}
+  ],meaning:"独自漂泊在外作异乡之客，每逢佳节良辰时都会更加思念家乡亲人。遥想兄弟们今日登高望远时，大家插遍茱萸却少了我一人。"},
+  {title:"望天门山",author:"李白（唐）",grade:"二年级",lines:[
+    {hz:"天门中断楚江开，",py:"tiān mén zhōng duàn chǔ jiāng kāi"},
+    {hz:"碧水东流至此回。",py:"bì shuǐ dōng liú zhì cǐ huí"},
+    {hz:"两岸青山相对出，",py:"liǎng àn qīng shān xiāng duì chū"},
+    {hz:"孤帆一片日边来。",py:"gū fān yī piàn rì biān lái"}
+  ],meaning:"天门山从中间断开，长江从中流过，碧绿的江水向东流到这里，折回向北。两岸高耸的青山，正好夹着天门山，一只小船从太阳旁边驶来。"},
+  {title:"饮湖上初晴后雨",author:"苏轼（宋）",grade:"三年级",lines:[
+    {hz:"水光潋滟晴方好，",py:"shuǐ guāng liàn yàn qíng fāng hǎo"},
+    {hz:"山色空蒙雨亦奇。",py:"shān sè kōng méng yǔ yì qí"},
+    {hz:"欲把西湖比西子，",py:"yù bǎ xī hú bǐ xī zǐ"},
+    {hz:"淡妆浓抹总相宜。",py:"dàn zhuāng nóng mǒ zǒng xiāng yí"}
+  ],meaning:"晴天，西湖水波荡漾，在阳光照耀下，光彩熠熠，美极了；下雨时，远处的山笼罩在烟雨之中，时隐时现，眼前一片迷茫，这朦胧的景色也是非常漂亮的。"},
+  {title:"早发白帝城",author:"李白（唐）",grade:"三年级",lines:[
+    {hz:"朝辞白帝彩云间，",py:"zhāo cí bái dì cǎi yún jiān"},
+    {hz:"千里江陵一日还。",py:"qiān lǐ jiāng líng yī rì huán"},
+    {hz:"两岸猿声啼不住，",py:"liǎng àn yuán shēng tí bù zhù"},
+    {hz:"轻舟已过万重山。",py:"qīng zhōu yǐ guò wàn chóng shān"}
+  ],meaning:"清晨告别白帝城，彩云之间，千里之遥的江陵，一天就可以到达。两岸猿猴的啼声不断，轻快的小舟已穿过万重青山。"},
+  {title:"宿新市徐公店",author:"杨万里（宋）",grade:"二年级",lines:[
+    {hz:"篱落疏疏一径深，",py:"lí luò shū shū yī jìng shēn"},
+    {hz:"树头花落未成阴。",py:"shù tóu huā luò wèi chéng yīn"},
+    {hz:"儿童急走追黄蝶，",py:"ér tóng jí zǒu zhuī huáng dié"},
+    {hz:"飞入菜花无处寻。",py:"fēi rù cài huā wú chù xún"}
+  ],meaning:"稀稀落落的篱笆旁，有一条小路伸向远方，树上的花瓣飘落了，但叶子还没有长茂密。小孩子飞快地奔跑追赶黄色的蝴蝶，可是蝴蝶飞入了菜花丛中，再也找不到了。"},
+  {title:"晓出净慈寺送林子方",author:"杨万里（宋）",grade:"三年级",lines:[
+    {hz:"毕竟西湖六月中，",py:"bì jìng xī hú liù yuè zhōng"},
+    {hz:"风光不与四时同。",py:"fēng guāng bù yǔ sì shí tóng"},
+    {hz:"接天莲叶无穷碧，",py:"jiē tiān lián yè wú qióng bì"},
+    {hz:"映日荷花别样红。",py:"yìng rì hé huā bié yàng hóng"}
+  ],meaning:"到底是西湖六月天的景色，风光与其他季节确实不同。莲叶接连无边无际一片碧绿，阳光下荷花分外红艳。"},
+  {title:"敕勒歌",author:"北朝民歌",grade:"二年级",lines:[
+    {hz:"敕勒川，",py:"chì lè chuān"},
+    {hz:"阴山下。",py:"yīn shān xià"},
+    {hz:"天似穹庐，",py:"tiān sì qióng lú"},
+    {hz:"笼盖四野。",py:"lóng gài sì yě"},
+    {hz:"天苍苍，野茫茫，",py:"tiān cāng cāng yě máng máng"},
+    {hz:"风吹草低见牛羊。",py:"fēng chuī cǎo dī xiàn niú yáng"}
+  ],meaning:"敕勒族生活的原野在阴山脚下，天空像圆顶毡帐笼罩着辽阔的大地。苍天浩渺，草原无边无际，风吹过来，草低下头，可以看见一群群的牛羊。"},
+  {title:"游子吟",author:"孟郊（唐）",grade:"二年级",lines:[
+    {hz:"慈母手中线，",py:"cí mǔ shǒu zhōng xiàn"},
+    {hz:"游子身上衣。",py:"yóu zǐ shēn shàng yī"},
+    {hz:"临行密密缝，",py:"lín xíng mì mì féng"},
+    {hz:"意恐迟迟归。",py:"yì kǒng chí chí guī"},
+    {hz:"谁言寸草心，",py:"shuí yán cùn cǎo xīn"},
+    {hz:"报得三春晖。",py:"bào dé sān chūn huī"}
+  ],meaning:"慈祥的母亲手里拿着针线，正给即将远游的孩子缝制衣服。临出发前针脚缝得密密的，心里担心孩子这次外出不知何时才能回来。谁说小草的心意，能报答得了春天的阳光？"},
+  {title:"寻隐者不遇",author:"贾岛（唐）",grade:"二年级",lines:[
+    {hz:"松下问童子，",py:"sōng xià wèn tóng zǐ"},
+    {hz:"言师采药去。",py:"yán shī cǎi yào qù"},
+    {hz:"只在此山中，",py:"zhǐ zài cǐ shān zhōng"},
+    {hz:"云深不知处。",py:"yún shēn bù zhī chù"}
+  ],meaning:"在松树下遇到一个小孩子，他说师父已经去采药了。只知道就在这座山里，但山里云雾弥漫，不知道在哪里。"},
+  {title:"池上",author:"白居易（唐）",grade:"一年级",lines:[
+    {hz:"小娃撑小艇，",py:"xiǎo wá chēng xiǎo tǐng"},
+    {hz:"偷采白莲回。",py:"tōu cǎi bái lián huí"},
+    {hz:"不解藏踪迹，",py:"bù jiě cáng zōng jì"},
+    {hz:"浮萍一道开。",py:"fú píng yī dào kāi"}
+  ],meaning:"小孩子撑着小船，偷偷地采了白莲回来。他不知道怎么隐藏自己的行踪，只见水面浮萍分出了一道痕迹。"},
+  {title:"画",author:"王维（唐）",grade:"一年级",lines:[
+    {hz:"远看山有色，",py:"yuǎn kàn shān yǒu sè"},
+    {hz:"近听水无声。",py:"jìn tīng shuǐ wú shēng"},
+    {hz:"春去花还在，",py:"chūn qù huā hái zài"},
+    {hz:"人来鸟不惊。",py:"rén lái niǎo bù jīng"}
+  ],meaning:"远看山峦有颜色，近听流水没有声音。春天去了花还在，人来了鸟不受惊。这是一幅画。"}
+];
+
+var PINYIN_CHARS = [
+  {c:'啊',p:'ā'},{c:'哦',p:'ō'},{c:'鹅',p:'é'},{c:'衣',p:'yī'},{c:'乌',p:'wū'},
+  {c:'鱼',p:'yú'},{c:'爸',p:'bà'},{c:'妈',p:'mā'},{c:'大',p:'dà'},{c:'小',p:'xiǎo'},
+  {c:'上',p:'shàng'},{c:'下',p:'xià'},{c:'来',p:'lái'},{c:'去',p:'qù'},{c:'好',p:'hǎo'}
+];
+
+var SCI_TOPICS = [
+  {id:'animals',emoji:'🐾',name:'动物世界',color:'#3DAA78',border:'#B8EDCE'},
+  {id:'plants',emoji:'🌿',name:'植物秘密',color:'#4A9A50',border:'#C0EAC8'},
+  {id:'weather',emoji:'☁️',name:'天气变化',color:'#3A90B5',border:'#B8DCEF'},
+  {id:'body2',emoji:'🫀',name:'身体探秘',color:'#C05080',border:'#F0C0D5'},
+  {id:'space',emoji:'🌙',name:'宇宙太空',color:'#7A6CC8',border:'#C8C0EE'},
+  {id:'earth',emoji:'🌍',name:'地球家园',color:'#C07000',border:'#FFD8A0'}
+];
+
+var SCI_QS = {
+  animals:[
+    {q:"鱼儿用什么呼吸？",opts:["肺","鳃","皮肤","鼻子"],ans:1,exp:"鱼用鳃呼吸，鳃能从水中获取氧气。"},
+    {q:"蝴蝶的一生经历哪几个阶段？",opts:["卵变毛毛虫再变蛹再变蝴蝶","卵直接变蝴蝶","蛹直接变卵","毛毛虫直接变蝴蝶"],ans:0,exp:"蝴蝶完全变态：卵→幼虫(毛毛虫)→蛹→成虫(蝴蝶)。"},
+    {q:"青蛙吃什么食物？",opts:["草","虫子","鱼","种子"],ans:1,exp:"青蛙主要吃各种昆虫和虫子，是益虫！"},
+    {q:"哪种动物是哺乳动物？",opts:["鸡","蛇","狗","青蛙"],ans:2,exp:"狗是哺乳动物，用母乳喂养宝宝。"},
+    {q:"鸟儿有几根翅膀？",opts:["1根","2根","3根","4根"],ans:1,exp:"鸟有两根翅膀，用来飞翔。"},
+    {q:"大象用什么喝水？",opts:["嘴巴","爪子","鼻子","尾巴"],ans:2,exp:"大象用长长的鼻子吸水喝水，鼻子是大象最重要的工具！"},
+    {q:"蜜蜂采的什么东西用来做蜂蜜？",opts:["树叶","花粉和花蜜","泥土","水"],ans:1,exp:"蜜蜂采集花蜜和花粉，回到蜂巢后酿造成蜂蜜。"},
+    {q:"哪种动物会变色？",opts:["狗","变色龙","猫","兔子"],ans:1,exp:"变色龙能改变皮肤颜色来伪装自己，保护自己不被天敌发现。"},
+    {q:"熊猫最爱吃什么？",opts:["肉","竹子","鱼","树叶"],ans:1,exp:"大熊猫每天要吃大量竹子，竹子是它们最主要的食物！"},
+    {q:"世界上最大的动物是什么？",opts:["大象","恐龙","蓝鲸","长颈鹿"],ans:2,exp:"蓝鲸是地球上最大的动物，体重可达180吨！"},
+    {q:"鸟儿在哪里生蛋？",opts:["地上","水里","巢里","树洞里"],ans:2,exp:"大多数鸟类会在树上或高处筑巢，然后在巢里生蛋孵小鸟。"},
+    {q:"蚕吐出的丝可以做什么？",opts:["做纸","做丝绸","做塑料","做玻璃"],ans:1,exp:"蚕吐出的蚕丝可以用来做丝绸，是非常珍贵的天然纤维！"},
+    {q:"狗狗用什么感知气味？",opts:["眼睛","耳朵","鼻子","舌头"],ans:2,exp:"狗的鼻子非常灵敏，闻气味的能力是人类的一万倍以上！"},
+    {q:"哪种昆虫会发光？",opts:["蝴蝶","蚂蚁","萤火虫","蜜蜂"],ans:2,exp:"萤火虫的腹部会发出冷光，这是化学反应产生的，夏天夜晚常能看到。"},
+    {q:"猫咪有几条腿？",opts:["2条","4条","6条","8条"],ans:1,exp:"猫咪有四条腿，是四足动物。它们还有锋利的爪子和很好的平衡感！"},
+    {q:"哪种动物冬天会冬眠？",opts:["狗","猫","熊","马"],ans:2,exp:"熊在冬天会进入冬眠状态，整个冬天都不吃不喝，靠消耗脂肪生存。"},
+    {q:"龟的壳有什么作用？",opts:["装饰用","保护身体","帮助游泳","储存食物"],ans:1,exp:"龟壳是乌龟的重要保护器官，遇到危险时可以把头和四肢缩进壳里！"},
+    {q:"企鹅生活在哪里？",opts:["北极","热带雨林","南极","沙漠"],ans:2,exp:"企鹅主要生活在南极洲，它们虽然不会飞，但游泳速度非常快！"},
+    {q:"哪种动物的脖子最长？",opts:["马","长颈鹿","骆驼","大象"],ans:1,exp:"长颈鹿的脖子最长，能帮助它们吃到高高树上的叶子！"},
+    {q:"蜘蛛用什么捕捉猎物？",opts:["爪子","网","嘴巴","尾巴"],ans:1,exp:"蜘蛛会吐丝织网，昆虫撞上蛛网就会被困住，蜘蛛再过来吃掉猎物。"},
+    {q:"鱼类用什么来游泳？",opts:["翅膀","腿","鳍","尾巴只用尾巴"],ans:2,exp:"鱼用鳍来控制方向和游泳，不同的鳍有不同的功能！"},
+    {q:"哪种鸟不会飞？",opts:["麻雀","老鹰","企鹅","燕子"],ans:2,exp:"企鹅是不会飞的鸟类，但它们是游泳高手，翅膀进化成了像桨一样的鳍状肢。"},
+    {q:"蜜蜂蜂巢的形状是什么？",opts:["圆形","三角形","六边形","正方形"],ans:2,exp:"蜜蜂蜂巢的每个蜂房都是六边形，这是最节省材料又最坚固的形状！"},
+    {q:"青蛙小时候叫什么？",opts:["小青蛙","蝌蚪","幼蛙","水虫"],ans:1,exp:"青蛙的幼体叫蝌蚪，有尾巴，用鳃呼吸，慢慢长大后变成青蛙。"},
+    {q:"海豚是鱼类吗？",opts:["是的","不是，是哺乳动物","是两栖动物","是爬行动物"],ans:1,exp:"海豚虽然生活在水里，但它是哺乳动物，需要到水面呼吸，还用母乳哺育宝宝！"},
+    {q:"哪种动物睡觉时是站着的？",opts:["猫","狗","马","兔子"],ans:2,exp:"马可以站着睡觉，因为它们的腿有锁定机制，可以保持平衡而不倒下。"},
+    {q:"蚂蚁能搬动多重的物体？",opts:["和自己一样重","比自己重10-50倍","比自己轻","和它一样重量的"],ans:1,exp:"蚂蚁力气很大，能搬运比自身重10到50倍的物体，相当于人举起一辆汽车！"},
+    {q:"哪种动物会假死？",opts:["猫","狮子","负鼠","兔子"],ans:2,exp:"负鼠遇到危险时会装死，让天敌以为它已经死了而放弃攻击！"},
+    {q:"河马大部分时间在哪里？",opts:["树上","水里","沙漠","山上"],ans:1,exp:"河马大部分时间在水中，水能帮它们保持皮肤湿润，也能防晒。"},
+    {q:"哪种动物有黑白条纹？",opts:["老虎","豹子","斑马","长颈鹿"],ans:2,exp:"斑马有黑白条纹，每只斑马的条纹都不一样，就像人的指纹！"}
+  ],
+  plants:[
+    {q:"植物生长需要什么？",opts:["只需要水","阳光水和空气","只需要阳光","只需要土"],ans:1,exp:"植物生长需要阳光、水和空气，缺一不可！"},
+    {q:"种子发芽时，最先长出来的是什么？",opts:["叶子","花","根","茎"],ans:2,exp:"种子发芽时，最先长出根，然后才是茎和叶。"},
+    {q:"树的年轮代表什么？",opts:["树的高度","树的年龄","树的重量","树的颜色"],ans:1,exp:"树干横截面的每个圆圈叫年轮，代表树生长了一年。"},
+    {q:"仙人掌生活在哪种环境？",opts:["海洋","森林","沙漠","极地"],ans:2,exp:"仙人掌生活在干燥的沙漠中，叶子变成刺减少水分蒸发。"},
+    {q:"植物通过什么制造氧气？",opts:["呼吸作用","光合作用","蒸腾作用","消化作用"],ans:1,exp:"植物通过光合作用，利用阳光、水和二氧化碳，产生氧气！"},
+    {q:"花的哪个部分产生花粉？",opts:["花瓣","叶子","雄蕊","根"],ans:2,exp:"雄蕊产生花粉，花粉经过传播后与雌蕊结合，才能产生种子。"},
+    {q:"叶子为什么是绿色的？",opts:["被涂了颜色","含有叶绿素","吸收了阳光","喝了水"],ans:1,exp:"叶子含有叶绿素，叶绿素是绿色的，能吸收阳光进行光合作用。"},
+    {q:"向日葵的花朝向哪里？",opts:["月亮","北方","太阳","地面"],ans:2,exp:"向日葵会随着太阳转动方向，始终面向太阳，所以叫向日葵！"},
+    {q:"竹子属于什么植物？",opts:["树木","草类","花卉","藤类"],ans:1,exp:"竹子虽然很高，但它其实是草类植物，生长速度非常快！"},
+    {q:"植物的根有什么作用？",opts:["进行光合作用","吸收水分和养分","开花结果","制造氧气"],ans:1,exp:"植物的根深入土壤，吸收水分和矿物质，是植物的基础！"},
+    {q:"松树冬天会落叶吗？",opts:["会","不会","有时会","只有部分叶子落"],ans:1,exp:"松树是常绿树，冬天不落叶，一年四季都是绿色的！"},
+    {q:"花的什么部分能吸引蝴蝶？",opts:["根","茎","花瓣和香气","叶子"],ans:2,exp:"花的鲜艳颜色和香甜气味能吸引蝴蝶、蜜蜂等昆虫来帮助传粉。"},
+    {q:"苹果、梨都是什么？",opts:["蔬菜","水果","花朵","种子"],ans:1,exp:"苹果和梨都是水果，是植物的果实，里面包含种子！"},
+    {q:"什么是光合作用？",opts:["动物吃食物","植物吸收阳光制造养分","植物呼吸","花朵开放"],ans:1,exp:"光合作用是植物利用阳光、水和二氧化碳，制造葡萄糖和氧气的过程！"},
+    {q:"哪种植物会吃虫子？",opts:["仙人掌","捕蝇草","向日葵","玫瑰"],ans:1,exp:"捕蝇草是食肉植物，能用叶子夹住昆虫，然后消化吸收它们！"},
+    {q:"树木在什么季节落叶？",opts:["春天","夏天","秋天","冬天"],ans:2,exp:"许多落叶树在秋天落叶，是为了减少水分散失，保护自己度过寒冬。"},
+    {q:"种子是如何传播的？",opts:["只靠风","只靠水","风水动物等多种方式","只靠动物"],ans:2,exp:"种子传播方式很多：风吹、水流、动物携带，还有弹射等方式！"},
+    {q:"大树的哪个部分运输水分？",opts:["叶子","花朵","树干中的管道","根的尖端"],ans:2,exp:"树干里有专门的导管，就像输水管道一样，把水分从根运输到叶子。"},
+    {q:"荷花生长在哪里？",opts:["沙漠","水中","山上","草原"],ans:1,exp:"荷花生长在水中或水边，根扎在泥土里，叶子和花浮在水面上。"},
+    {q:"草莓的种子长在哪里？",opts:["里面","外面表皮","根里","叶子里"],ans:1,exp:"草莓的种子长在外表皮上，那些小小的点点就是种子！"},
+    {q:"植物最高能长多高？",opts:["几厘米","几米","几十米","一百米以上"],ans:3,exp:"世界上最高的树是北美红杉，可以长到100多米高，像30层楼那么高！"},
+    {q:"棉花可以用来做什么？",opts:["做玻璃","做金属","做布料","做石头"],ans:2,exp:"棉花是天然纤维，可以纺成棉线，再织成布料做衣服！"},
+    {q:"哪种植物的叶子会变红？",opts:["松树","竹子","枫树","仙人掌"],ans:2,exp:"枫树的叶子在秋天会变成鲜艳的红色，非常漂亮！"},
+    {q:"植物需要多少水？",opts:["越多越好","不同植物需要不同量","越少越好","完全不需要水"],ans:1,exp:"不同植物需要不同量的水，仙人掌很耐旱，而水稻需要大量的水。"},
+    {q:"茶叶来自什么植物？",opts:["茶树","咖啡树","苹果树","松树"],ans:0,exp:"茶叶来自茶树，把茶树的叶子采摘下来，经过加工就变成我们喝的茶！"},
+    {q:"花粉是什么颜色？",opts:["只有黄色","只有白色","多种颜色","只有红色"],ans:2,exp:"花粉有各种颜色，黄色、白色、红色、橙色都有，颜色因花的种类而不同。"},
+    {q:"什么是叶脉？",opts:["叶子的边缘","叶子里面的线条","叶子的颜色","叶子的大小"],ans:1,exp:"叶脉是叶子里面的线条，是叶子的输水管道，把水分和养分送到叶子各处。"},
+    {q:"玫瑰上有什么保护自己？",opts:["毒液","刺","颜色","气味"],ans:1,exp:"玫瑰茎上有锋利的刺，能防止动物来吃它！"},
+    {q:"苔藓生长在哪里？",opts:["干燥的沙漠","潮湿的地方","深海","冰川上"],ans:1,exp:"苔藓喜欢潮湿的环境，常见于阴暗潮湿的石头、树干上。"},
+    {q:"大豆可以做成什么食品？",opts:["面包","豆腐和豆浆","肉类","水果"],ans:1,exp:"大豆可以做成豆腐、豆浆、酱油等很多食品，是非常有营养的植物！"}
+  ],
+  weather:[
+    {q:"彩虹出现在什么时候？",opts:["下雨前","雨后有阳光时","晚上","冬天"],ans:1,exp:"彩虹在雨后阳光照射水珠时出现，光线折射产生七种颜色！"},
+    {q:"云是由什么组成的？",opts:["棉花","水蒸气变成的小水滴","烟雾","气泡"],ans:1,exp:"云是由无数微小的水滴或冰晶组成的，漂浮在空气中。"},
+    {q:"温度计用来测量什么？",opts:["重量","长度","温度","时间"],ans:2,exp:"温度计用来测量温度，帮我们知道天气冷还是热。"},
+    {q:"风是怎么形成的？",opts:["云移动产生的","空气流动产生的","树摇动产生的","河水流动产生的"],ans:1,exp:"风是空气流动产生的，热空气上升，冷空气来补充，就形成了风。"},
+    {q:"雪为什么是白色的？",opts:["因为很冷","因为反射所有光","因为加了颜料","因为是冰"],ans:1,exp:"雪花反射所有颜色的光，所以我们看到的是白色。"},
+    {q:"闪电和雷声，哪个先到？",opts:["雷声先","闪电先","同时到达","不确定"],ans:1,exp:"闪电先到！光速比声速快得多，所以我们先看到闪电，后听到雷声。"},
+    {q:"为什么夏天热冬天冷？",opts:["地球离太阳距离不同","地球倾斜，阳光照射角度不同","太阳变大变小","风的方向不同"],ans:1,exp:"地球是倾斜的，不同季节阳光照射地球的角度不同，所以有冷热之分。"},
+    {q:"雾是什么？",opts:["烟","靠近地面的云","水汽","污染"],ans:1,exp:"雾其实就是靠近地面的云，由无数微小水滴组成，让能见度降低。"},
+    {q:"哪种天气会下冰雹？",opts:["晴天","雷雨天","小雨天","有雾的天"],ans:1,exp:"冰雹是在强雷雨天气中，水滴在高空结冰后落下来形成的。"},
+    {q:"雨是怎么来的？",opts:["天上有水桶","水蒸发升到空中变成云再降落","从地下来","工厂制造的"],ans:1,exp:"水蒸发变成水蒸气，上升后变成云，云中水滴越来越重，就降落成雨！"},
+    {q:"台风中心叫什么？",opts:["台风头","台风眼","台风核","台风心"],ans:1,exp:"台风中心叫台风眼，是台风中风力最小的地方，中心相对平静。"},
+    {q:"我们用什么来测量降雨量？",opts:["温度计","雨量计","风速仪","湿度计"],ans:1,exp:"雨量计是专门测量降雨量的仪器，可以知道一段时间内下了多少雨。"},
+    {q:"冬天为什么我们呼出的气是白色的？",opts:["气变成了牛奶","呼出的热气遇冷变成小水珠","气是白色的","肺里有白色气体"],ans:1,exp:"我们体温较高，呼出的热气遇到冷空气后，水蒸气凝结成了小水珠，看起来是白色的。"},
+    {q:"彩虹有几种颜色？",opts:["5种","6种","7种","8种"],ans:2,exp:"彩虹有7种颜色：红橙黄绿蓝靛紫，是光线经过雨滴折射形成的！"},
+    {q:"大雪后为什么感觉很安静？",opts:["大家都在睡觉","雪能吸收声音","冬天动物不叫","没有风"],ans:1,exp:"雪花之间有很多空隙，能吸收声波，所以大雪后环境会变得特别安静。"},
+    {q:"沙漠为什么很少下雨？",opts:["没有云","太热了","缺少水分来源","太风大了"],ans:2,exp:"沙漠地区水分来源很少，空气干燥，水蒸气不足，很难形成雨云。"},
+    {q:"春雨对植物有什么好处？",opts:["让植物死亡","帮助植物生长","让植物变矮","没什么用"],ans:1,exp:"春雨给植物提供水分，温度适宜，有助于种子萌发和植物生长。"},
+    {q:"雷电有什么危险？",opts:["没有危险","会引起火灾和伤人","让人感冒","让植物长高"],ans:1,exp:"雷电是高压电，打到人或建筑物上非常危险，所以打雷时要躲进室内！"},
+    {q:"什么是霜？",opts:["小雨","水蒸气遇冷结成的冰晶","雪的一种","雾的一种"],ans:1,exp:"霜是空气中的水蒸气遇到冰冷的地面或物体后，直接结成的冰晶。"},
+    {q:"天气预报怎么得到的？",opts:["猜测","气象卫星和地面站等观测","看云","问农民"],ans:1,exp:"气象部门用卫星、雷达、气象站等多种方法收集数据，再用电脑分析预测天气。"},
+    {q:"冰雪融化后变成什么？",opts:["消失了","水","气体","沙子"],ans:1,exp:"冰雪受热融化后变成水，这就是水的三种状态之间的转变！"},
+    {q:"海边为什么风比较大？",opts:["海里有风机","海陆温差产生的风","海浪造成的","船只造成的"],ans:1,exp:"海面和陆地吸热速度不同，温差产生气压差，所以海边风比较大。"},
+    {q:"梅雨季节是什么时候？",opts:["冬天","夏天初期","秋天","春天"],ans:1,exp:"梅雨季节一般在每年5-7月，这时长江流域会连续下雨，因正值梅子成熟而得名。"},
+    {q:"气温计的单位是什么？",opts:["千克","厘米","摄氏度","升"],ans:2,exp:"温度的单位是摄氏度（℃），中国和大多数国家都用摄氏度来表示温度。"},
+    {q:"什么叫龙卷风？",opts:["很强的台风","漏斗形的旋转风柱","大暴雨","强雷电"],ans:1,exp:"龙卷风是从雷暴云底延伸到地面的漏斗形旋风，风速极快，破坏力很强！"},
+    {q:"彩虹在太阳的哪个方向出现？",opts:["同一方向","相对方向","上方","下方"],ans:1,exp:"彩虹出现在背对太阳的方向，也就是太阳在你背后时，你面向的方向。"},
+    {q:"积雪覆盖的地方有什么好处？",opts:["没有好处","保温保护土壤和植物根部","让动物冷","吸引游客"],ans:1,exp:"积雪像一层棉被，能保持土壤温度，保护植物的根部不被严寒冻坏。"},
+    {q:"天空为什么是蓝色的？",opts:["被蓝色颜料染的","大气散射蓝光","海洋反射","天上有蓝色云"],ans:1,exp:"阳光经过大气层时，蓝色的光被散射得最多，所以我们看到天空是蓝色的！"},
+    {q:"为什么早晨和傍晚天空是红色的？",opts:["太阳变红了","阳光穿过厚厚的大气层散射","大气污染","云变红了"],ans:1,exp:"早晨和傍晚太阳在地平线附近，光线要穿过更厚的大气层，蓝光散射掉了，剩下红橙色的光！"},
+    {q:"为什么下雨之前蚂蚁要搬家？",opts:["它们想换地方住","感觉到气压和湿度变化","老师叫它们搬","随便走走"],ans:1,exp:"蚂蚁对天气变化非常敏感，能感受到气压降低和湿度升高，所以会提前搬到高处！"}
+  ],
+  body2:[
+    {q:"人体最大的器官是什么？",opts:["心脏","肝脏","皮肤","大脑"],ans:2,exp:"皮肤是人体最大的器官，保护我们身体免受伤害！"},
+    {q:"我们用什么来呼吸？",opts:["胃","心脏","肺","肾脏"],ans:2,exp:"我们用肺来呼吸，吸入氧气，呼出二氧化碳。"},
+    {q:"血液在体内靠什么流动？",opts:["肺","大脑","心脏","骨骼"],ans:2,exp:"心脏像一个泵，不停地跳动，把血液输送到全身。"},
+    {q:"我们两只手共有几根手指头？",opts:["8根","9根","10根","12根"],ans:2,exp:"我们两只手共有10根手指头，每只手5根。"},
+    {q:"骨骼的主要作用是什么？",opts:["帮助消化","支撑身体保护器官","帮助思考","产生血液"],ans:1,exp:"骨骼支撑我们的身体，保护内脏器官，还帮助我们运动！"},
+    {q:"人体有多少块骨头？",opts:["100块","206块","50块","300块"],ans:1,exp:"成年人有206块骨头，婴儿有更多，随着生长有些骨头会合并在一起。"},
+    {q:"大脑的作用是什么？",opts:["消化食物","控制思维和身体","呼吸","产生血液"],ans:1,exp:"大脑是人体的指挥中心，控制思维、记忆、感情和身体的各种活动！"},
+    {q:"眼睛里什么部分控制进光量？",opts:["角膜","虹膜","视网膜","晶状体"],ans:1,exp:"虹膜（眼睛的有色部分）通过调节瞳孔大小来控制进入眼睛的光量！"},
+    {q:"食物消化从哪里开始？",opts:["胃","小肠","嘴巴","食道"],ans:2,exp:"消化从嘴巴开始！牙齿嚼碎食物，唾液中有消化酶，帮助食物开始分解。"},
+    {q:"人体最坚硬的部分是什么？",opts:["骨头","牙齿","指甲","皮肤"],ans:1,exp:"牙齿（牙釉质）是人体最坚硬的物质，比骨头还硬！"},
+    {q:"为什么我们需要睡觉？",opts:["无聊的时候","大脑和身体需要休息和修复","没有原因","省电"],ans:1,exp:"睡眠时大脑整理记忆，身体修复细胞，对健康非常重要！"},
+    {q:"耳朵除了听声音还有什么功能？",opts:["看东西","保持平衡","闻气味","品味道"],ans:1,exp:"耳朵里有平衡器官，帮助我们保持身体平衡，走路不摔倒！"},
+    {q:"人的正常体温是多少？",opts:["35度","36-37度","40度","34度"],ans:1,exp:"正常体温是36-37摄氏度，发烧时体温超过37.5度就需要注意了。"},
+    {q:"为什么我们会打喷嚏？",opts:["因为开心","鼻子排出刺激物的保护反应","因为累了","锻炼鼻子"],ans:1,exp:"打喷嚏是鼻子感受到刺激（如灰尘、细菌）时的保护反射，能把刺激物排出去！"},
+    {q:"什么是白细胞？",opts:["骨头里的细胞","血液中抵抗疾病的细胞","皮肤细胞","神经细胞"],ans:1,exp:"白细胞是血液中的免疫细胞，能识别和消灭入侵的细菌和病毒，保护我们健康！"},
+    {q:"人体有几个肾脏？",opts:["1个","2个","3个","4个"],ans:1,exp:"人体有两个肾脏，位于背部两侧，负责过滤血液中的废物，产生尿液。"},
+    {q:"为什么运动后会喘气？",opts:["累了","身体需要更多氧气","热了","害怕了"],ans:1,exp:"运动时肌肉需要更多氧气，心脏加速跳动，呼吸也加快，来满足身体需求！"},
+    {q:"指纹有什么用？",opts:["装饰","帮助抓握和识别身份","防水","散热"],ans:1,exp:"指纹的纹路能增加摩擦力，帮助我们抓握东西，每个人的指纹都是独一无二的！"},
+    {q:"人体最重要的营养素是什么？",opts:["糖","蛋白质、碳水化合物、脂肪、维生素和矿物质","盐","纤维"],ans:1,exp:"人体需要多种营养素：蛋白质、碳水化合物、脂肪、维生素和矿物质，缺一不可！"},
+    {q:"皮肤有什么功能？",opts:["只是装饰","保护、感知、调节体温","只是防水","只是美观"],ans:1,exp:"皮肤是多功能器官：保护身体、感受冷热痛痒、调节体温、排汗等功能！"},
+    {q:"骨骼里有什么？",opts:["只有钙","骨髓，能造血","只有水","只有骨细胞"],ans:1,exp:"骨骼里有骨髓，红骨髓负责制造血细胞，是造血的重要器官！"},
+    {q:"我们为什么会流眼泪？",opts:["眼睛漏水了","保护眼睛和情感表达","冷了","累了"],ans:1,exp:"眼泪有多种作用：润滑眼睛、冲洗灰尘、在情绪激动时释放压力！"},
+    {q:"什么是消化系统？",opts:["心脏和血管","从嘴到肠胃的消化器官系统","骨骼系统","神经系统"],ans:1,exp:"消化系统包括嘴巴、食道、胃、小肠、大肠等，负责消化和吸收食物！"},
+    {q:"为什么骨折后需要打石膏？",opts:["好看","固定骨头使其正确愈合","防止感染","减轻痛苦"],ans:1,exp:"石膏能固定断骨，让骨头在正确的位置上慢慢愈合，一般需要几周时间。"},
+    {q:"鼻毛有什么用？",opts:["装饰","过滤空气中的灰尘","帮助呼吸","没有用"],ans:1,exp:"鼻毛能过滤吸入空气中的灰尘和细菌，是身体的第一道防线！"},
+    {q:"人体的哪个器官储存胆汁？",opts:["肝脏","胃","胆囊","肾脏"],ans:2,exp:"胆囊储存肝脏产生的胆汁，吃饭时把胆汁释放出来，帮助消化脂肪食物。"},
+    {q:"为什么我们要吃早饭？",opts:["因为习惯","为大脑和身体提供一天的能量","不需要","好玩"],ans:1,exp:"经过一夜睡眠，血糖下降，早饭能补充能量，让大脑和身体有力气开始新的一天！"},
+    {q:"汗液从哪里排出？",opts:["眼睛","皮肤上的汗腺","嘴巴","鼻子"],ans:1,exp:"汗液通过皮肤上的汗腺排出，帮助调节体温，当热了就会出汗降温。"},
+    {q:"人体有几种血型？",opts:["2种","4种基本血型","8种","10种"],ans:1,exp:"基本血型有A、B、AB、O四种，还有Rh因子，每个人都有其中一种血型。"},
+    {q:"人体每天需要喝多少水？",opts:["1杯","6-8杯以上","10杯以下","随便"],ans:1,exp:"一般成年人每天需要喝6-8杯水（约1.5-2升），儿童也要多喝水保持健康！"}
+  ],
+  space:[
+    {q:"地球绕着什么转？",opts:["月亮","火星","太阳","银河"],ans:2,exp:"地球绕着太阳转，转一圈需要365天，就是一年！"},
+    {q:"月亮是什么？",opts:["一颗星星","地球的卫星","一颗行星","太阳的一部分"],ans:1,exp:"月亮是地球的卫星，它绕着地球转，反射太阳光。"},
+    {q:"太阳系中最大的行星是哪颗？",opts:["地球","火星","木星","土星"],ans:2,exp:"木星是太阳系中最大的行星，比地球大了一千多倍！"},
+    {q:"宇航员在太空中为什么会飘起来？",opts:["因为没有重力","因为穿了特殊衣服","因为风很大","因为太空很冷"],ans:0,exp:"太空中重力很小，所以宇航员会漂浮起来，感觉像在游泳！"},
+    {q:"地球自转一圈需要多长时间？",opts:["一年","一个月","一天24小时","一周"],ans:2,exp:"地球自转一圈需要24小时，这就是为什么有白天和黑夜！"},
+    {q:"太阳系有几颗行星？",opts:["6颗","7颗","8颗","9颗"],ans:2,exp:"太阳系有8颗行星：水星、金星、地球、火星、木星、土星、天王星、海王星。"},
+    {q:"太阳是什么？",opts:["一颗行星","一颗恒星","一颗卫星","一块岩石"],ans:1,exp:"太阳是一颗恒星，是由氢和氦组成的巨大发光发热气球，为太阳系提供光和热！"},
+    {q:"月食是怎么形成的？",opts:["月亮消失了","地球运行到太阳和月亮之间","太阳消失了","月亮飞走了"],ans:1,exp:"月食是当地球运行到太阳和月亮之间，地球的影子遮住了月亮，就会出现月食。"},
+    {q:"哪颗行星有美丽的光环？",opts:["火星","木星","土星","天王星"],ans:2,exp:"土星有壮观的光环系统，主要由冰块和岩石碎片组成，非常美丽！"},
+    {q:"流星是什么？",opts:["掉落的星星","太空碎片进入大气层燃烧","太阳的光","UFO"],ans:1,exp:"流星是太空中的小石块（陨石体）进入地球大气层，摩擦燃烧发光形成的！"},
+    {q:"黑洞是什么？",opts:["宇宙中的黑色星球","引力极强能吸进一切的天体","黑色的洞穴","暗夜的空间"],ans:1,exp:"黑洞是引力极强的天体，连光都逃不出去，是宇宙中最神秘的存在之一！"},
+    {q:"距离地球最近的恒星是哪颗？",opts:["北极星","织女星","太阳","牛郎星"],ans:2,exp:"距离地球最近的恒星就是太阳！其次是半人马座的比邻星，距离约4.2光年。"},
+    {q:"宇宙是什么时候形成的？",opts:["1000年前","100亿年前","138亿年前","无法知道"],ans:2,exp:"根据科学家研究，宇宙诞生于约138亿年前的大爆炸（Big Bang）！"},
+    {q:"什么是星系？",opts:["一颗星星","一组行星","由亿万颗星星组成的系统","太阳系的另一个名字"],ans:2,exp:"星系是由亿万颗星星、星云、暗物质等组成的巨大系统，我们在银河系里！"},
+    {q:"银河系的形状像什么？",opts:["圆形","正方形","螺旋形盘状","三角形"],ans:2,exp:"银河系是螺旋形盘状星系，从侧面看像个凸透镜，从上面看有漂亮的旋臂！"},
+    {q:"月亮本身会发光吗？",opts:["会，自己发光","不会，反射太阳光","白天发光","晚上才会"],ans:1,exp:"月亮本身不会发光，我们看到的月光是月亮反射的太阳光！"},
+    {q:"一光年是什么？",opts:["光照射一年的时间","光在一年中传播的距离","一年的时间","太阳到地球的距离"],ans:1,exp:"一光年是光在一年中传播的距离，约9.46万亿千米，是衡量宇宙距离的单位！"},
+    {q:"哪颗行星最热？",opts:["水星（最近太阳）","金星","火星","木星"],ans:1,exp:"金星最热！虽然水星最近太阳，但金星有浓厚的大气层（温室效应），表面温度高达460℃！"},
+    {q:"国际空间站在哪里？",opts:["月球上","地球轨道上","火星附近","太阳旁边"],ans:1,exp:"国际空间站在距地面约400千米的轨道上运行，每90分钟绕地球一圈！"},
+    {q:"为什么夜晚能看到星星，白天不能？",opts:["白天星星消失了","太阳光太亮掩盖了星光","星星白天在睡觉","白天太热星星融化"],ans:1,exp:"星星白天也在，但太阳光太强，我们眼睛无法分辨微弱的星光，所以只有夜晚才能看到！"},
+    {q:"火星为什么是红色的？",opts:["有很多火","表面含有氧化铁（铁锈）","空气是红色的","太阳把它烤红了"],ans:1,exp:"火星表面有大量含铁的矿物质，铁被氧化（生锈）后变成红色，所以火星是红色的！"},
+    {q:"太阳系中哪颗行星距太阳最近？",opts:["地球","金星","水星","火星"],ans:2,exp:"水星是距离太阳最近的行星，但因为没有大气层保温，温度变化极大。"},
+    {q:"彗星的尾巴指向哪里？",opts:["运动方向","背对太阳","太阳方向","地球方向"],ans:1,exp:"彗星的尾巴总是背对太阳，因为太阳风把彗星的气体和尘埃吹向背离太阳的方向。"},
+    {q:"哪个国家第一个把人送上月球？",opts:["俄罗斯","中国","美国","法国"],ans:2,exp:"1969年，美国宇航员阿姆斯特朗乘坐阿波罗11号，成为第一个踏上月球的人！"},
+    {q:"北极星有什么特别之处？",opts:["最亮的星","几乎指向正北方","最大的星","最近的星"],ans:1,exp:"北极星位于地球北极轴正上方，在地球自转时几乎不移动，是古代导航的重要参考！"},
+    {q:"为什么太空中没有声音？",opts:["太冷了","没有空气传播声音","声音太小","太远了"],ans:1,exp:"声音需要通过介质（气体、液体、固体）传播，太空几乎是真空，所以没有声音！"},
+    {q:"一年有几个月？",opts:["10个月","11个月","12个月","13个月"],ans:2,exp:"一年有12个月，这是地球绕太阳一圈的时间（365天）被平均分成12份！"},
+    {q:"什么是日食？",opts:["太阳爆炸","月亮遮住太阳","地球消失","太阳变暗"],ans:1,exp:"日食是月亮运行到太阳和地球之间，把太阳遮住了，我们在地球上看到太阳消失或变暗！"},
+    {q:"哪颗行星自转最快？",opts:["地球","火星","木星","土星"],ans:2,exp:"木星自转最快，只需要约10小时自转一圈，而地球需要24小时！"},
+    {q:"太空探测器旅行者1号在哪里？",opts:["火星附近","木星附近","已飞出太阳系","月球背面"],ans:2,exp:"旅行者1号于1977年发射，是人类制造的飞得最远的物体，现已飞出太阳系！"}
+  ],
+  earth:[
+    {q:"地球表面最多的物质是什么？",opts:["石头","沙子","水","土"],ans:2,exp:"地球表面约71%是水，地球是个蓝色的水球！"},
+    {q:"我们应该怎样保护环境？",opts:["乱扔垃圾","节约用水用电垃圾分类","多用塑料袋","烧树木"],ans:1,exp:"保护环境需要节约资源、垃圾分类、减少污染，人人有责！"},
+    {q:"地球上的空气主要是什么？",opts:["纯氧气","纯二氧化碳","氮气和氧气","水蒸气"],ans:2,exp:"空气主要由氮气(约78%)和氧气(约21%)组成。"},
+    {q:"地球有几大洲？",opts:["5大洲","6大洲","7大洲","8大洲"],ans:2,exp:"地球有7大洲：亚洲、欧洲、非洲、北美洲、南美洲、大洋洲、南极洲。"},
+    {q:"植物通过什么过程产生氧气？",opts:["呼吸作用","光合作用","蒸腾作用","消化作用"],ans:1,exp:"植物通过光合作用，利用阳光、水和二氧化碳，产生氧气和养分。"},
+    {q:"地球的内部有什么？",opts:["空的","岩石和炽热的液态金属","水","宝藏"],ans:1,exp:"地球内部分层：地壳（岩石层）、地幔（软流层）、外核（液态金属）、内核（固态铁镍）！"},
+    {q:"世界上最长的河流是哪条？",opts:["长江","黄河","尼罗河","亚马逊河"],ans:2,exp:"尼罗河长约6650千米，是世界上最长的河流，流经非洲北部注入地中海！"},
+    {q:"为什么地球适合生命居住？",opts:["离太阳最近","有水、大气层、适宜温度","地球最大","最古老的星球"],ans:1,exp:"地球有液态水、保护性大气层和适宜的温度，这三个条件使地球成为生命的家园！"},
+    {q:"地震是怎么发生的？",opts:["地球在跳舞","地壳板块运动和断层错动","地下有怪物","外星人造成的"],ans:1,exp:"地球表面由几大板块组成，板块之间相互挤压、碰撞或错动，就会引发地震！"},
+    {q:"火山是什么？",opts:["大山","从地球内部喷出岩浆的开口","水下的山","冰山"],ans:1,exp:"火山是地球内部熔融岩浆（岩浆）从地表裂缝喷出的地方，喷发时非常壮观！"},
+    {q:"地球上的水循环是怎样的？",opts:["水从天上掉下来然后消失","水蒸发成云再降落成雨，循环不止","水只从河流到海洋","雨下完就没了"],ans:1,exp:"水循环：海洋蒸发→形成云→降雨→汇入河流→流向海洋→再蒸发，永无止境！"},
+    {q:"为什么海水是咸的？",opts:["有人在里面加盐","河流把陆地上的矿物质带入海洋积累","海里有盐矿","天生就是咸的"],ans:1,exp:"数十亿年来，河流把岩石中的矿物质（包括盐分）不断冲入海洋，逐渐积累变咸！"},
+    {q:"沙漠是什么？",opts:["很热的地方","年降水量极少的干旱地区","没有树的地方","只有沙子的地方"],ans:1,exp:"沙漠是年降水量极少（通常低于250毫米）的干旱地区，可以很热也可以很冷！"},
+    {q:"热带雨林在哪里最多？",opts:["南极","赤道附近","北极","沙漠旁边"],ans:1,exp:"热带雨林主要分布在赤道附近，如亚马逊、刚果盆地，那里温暖潮湿，物种最丰富！"},
+    {q:"地球的大气层有什么作用？",opts:["让地球更漂亮","保护地球、提供呼吸的空气、保温","让飞机飞翔","产生重力"],ans:1,exp:"大气层保护地球免受宇宙射线和陨石轰击，提供生命所需的空气，还能调节温度！"},
+    {q:"南极洲有什么特点？",opts:["最热的大洲","被冰雪覆盖，没有永久居民","最小的大洲","动物最多的地方"],ans:1,exp:"南极洲是被冰雪覆盖的大陆，是地球上最冷的地方，没有原住民，只有科学家！"},
+    {q:"珊瑚礁生长在哪里？",opts:["深海","温暖的浅海","河流里","沙漠里"],ans:1,exp:"珊瑚礁生长在温暖、清澈的浅海中，是海洋生物多样性最丰富的生态系统！"},
+    {q:"为什么我们要节约用水？",opts:["为了省钱","淡水资源有限，地球淡水只有很少一部分","水太多了","节约时间"],ans:1,exp:"地球虽有大量水，但淡水只占约2.5%，可直接使用的更少，所以要珍惜每一滴水！"},
+    {q:"森林对地球有什么作用？",opts:["只是好看","净化空气、调节气候、提供栖息地","制造污染","吸收水分使地方变干"],ans:1,exp:"森林是地球的肺，吸收二氧化碳释放氧气，调节气候，为无数生物提供家园！"},
+    {q:"全球变暖的主要原因是什么？",opts:["太阳变热了","人类活动排放大量温室气体","地球自己变热","风带来的热量"],ans:1,exp:"人类大量燃烧化石燃料、砍伐森林，排放大量二氧化碳等温室气体，导致全球气温升高！"},
+    {q:"地球表面的陆地和海洋哪个多？",opts:["陆地多","差不多","海洋多","都一样"],ans:2,exp:"地球表面约71%是海洋，只有29%是陆地，所以从太空看地球是蓝色的！"},
+    {q:"中国的最高山是哪座？",opts:["华山","泰山","珠穆朗玛峰","黄山"],ans:2,exp:"珠穆朗玛峰是中国也是世界第一高峰，海拔约8848米，位于中尼边境！"},
+    {q:"为什么会发生滑坡？",opts:["地球在运动","大量降雨使土壤不稳定","动物造成的","风吹的"],ans:1,exp:"滑坡通常是大量降雨使山坡土壤变重变软，失去稳定性后向下滑动的自然灾害。"},
+    {q:"地球上最深的地方是哪里？",opts:["太平洋","马里亚纳海沟","大西洋","北冰洋"],ans:1,exp:"马里亚纳海沟是地球上最深的地方，最深处约11000米，比珠穆朗玛峰还要深！"},
+    {q:"土壤里有什么？",opts:["只有泥土","岩石颗粒、有机物、水、空气和微生物","只有沙子","只有石头"],ans:1,exp:"健康的土壤含有岩石颗粒、有机物（腐烂的动植物）、水、空气和数十亿微生物！"},
+    {q:"地球最古老的岩石大概有多少年？",opts:["100万年","1000万年","40亿年","100亿年"],ans:2,exp:"已知地球上最古老的岩石约有40亿年历史，地球本身约有46亿年历史！"},
+    {q:"为什么不能在海里游泳时喝海水？",opts:["味道不好","海水太咸，喝了反而更渴，损害肾脏","海水太脏","海水太冷"],ans:1,exp:"海水含大量盐分，喝了不但不解渴，身体还要消耗更多水来排出盐分，反而更加脱水！"},
+    {q:"热带雨林被称为地球的什么？",opts:["心脏","肺","大脑","胃"],ans:1,exp:"热带雨林被称为地球的肺，因为它们吸收大量二氧化碳，释放大量氧气！"},
+    {q:"海洋对气候有什么影响？",opts:["没有影响","调节温度，储存热量，影响降雨","只让海边更热","让地球变冷"],ans:1,exp:"海洋能吸收和储存大量热量，调节全球气温，影响气流和降雨模式，对气候至关重要！"},
+    {q:"垃圾分类有什么好处？",opts:["没什么用","减少污染，实现资源再利用","让垃圾更多","浪费时间"],ans:1,exp:"垃圾分类能让可回收物得到再利用，减少填埋和焚烧，保护环境，节约资源！"}
+  ]
+};
+
+var VIRTUE_DATA = [
+  {tag:"尊重",tagColor:"#7A5CB8",tagBg:"#F2EEF9",border:"#C9B8E8",
+   story:"放学后，嘉禾走在路上，看见一位老爷爷提着很重的东西，走得很慢，非常吃力。",
+   q:"嘉禾应该怎么做？",
+   opts:[
+     {text:"A. 假装没看见，快快走掉",good:false,fb:"我们应该伸出援手帮助需要帮助的人，这才是有爱心的好孩子！"},
+     {text:"B. 上前问：爷爷，我帮您拿吧！",good:true,fb:"你真棒！帮助需要帮助的人，是中华民族的传统美德！爷爷一定很感激你。"},
+     {text:"C. 站着看热闹",good:false,fb:"遇到需要帮助的人，我们应该主动伸出援手，而不是只是旁观。"}
+   ]},
+  {tag:"诚实",tagColor:"#C07000",tagBg:"#FFF3E0",border:"#FFB347",
+   story:"上数学课，老师出了一道题，嘉禾算出来答案是15，但是旁边小明说答案是20。嘉禾不确定谁对谁错。",
+   q:"嘉禾应该怎么做？",
+   opts:[
+     {text:"A. 把答案改成20，和小明一样",good:false,fb:"抄别人的答案是不诚实的行为，我们要相信自己，认真思考！"},
+     {text:"B. 举手问老师，说出自己的答案是15",good:true,fb:"太棒了！诚实地说出自己的想法，勇于提问，这才是学习的好方法！"},
+     {text:"C. 随便写一个不同的数字",good:false,fb:"做题要认真思考，不要随意填写，诚实地面对自己的能力！"}
+   ]},
+  {tag:"责任",tagColor:"#3DAA78",tagBg:"#E8F8F2",border:"#A8E6CF",
+   story:"嘉禾负责每天给班级里的小植物浇水。今天她很想先去玩，然后再浇水。但是天气很热，植物可能会枯萎。",
+   q:"嘉禾应该怎么做？",
+   opts:[
+     {text:"A. 先去玩，等一会儿再浇",good:false,fb:"责任心就是先完成自己的职责，再去玩耍。植物等不了太久！"},
+     {text:"B. 先把植物浇好水，再去玩",good:true,fb:"非常棒！先把责任做好，再享乐，这就是有责任心的好孩子！植物谢谢你！"},
+     {text:"C. 请别人帮忙浇，自己去玩",good:false,fb:"这是你的责任，要自己完成哦。可以快速浇好再去玩！"}
+   ]},
+  {tag:"分享",tagColor:"#C04070",tagBg:"#FDE8EE",border:"#F4A0B5",
+   story:"午饭时，嘉禾带来了一包好吃的饼干。好朋友小花没有零食，眼巴巴地看着嘉禾。",
+   q:"嘉禾应该怎么做？",
+   opts:[
+     {text:"A. 把饼干藏起来，不让小花看到",good:false,fb:"分享是最快乐的事情！藏起来自己吃会让朋友很伤心。"},
+     {text:"B. 主动分给小花一些，说我们一起吃吧",good:true,fb:"真棒！分享让友谊更深厚，快乐也会加倍！小花一定很开心！"},
+     {text:"C. 等小花走了再吃",good:false,fb:"朋友在旁边，我们应该主动分享，这样友谊才会更好！"}
+   ]},
+  {tag:"感恩",tagColor:"#3A90B5",tagBg:"#E8F5FA",border:"#A8D8EA",
+   story:"妈妈每天很辛苦地工作，回家还要做饭、洗衣服、照顾嘉禾。今天是妈妈的生日。",
+   q:"嘉禾应该怎么做？",
+   opts:[
+     {text:"A. 什么都不做，继续玩玩具",good:false,fb:"妈妈为我们付出了那么多，我们要懂得感恩，表达爱意！"},
+     {text:"B. 给妈妈画一张画，说妈妈我爱你生日快乐",good:true,fb:"太感人了！感恩妈妈的付出，这个小小的礼物一定会让妈妈很开心！"},
+     {text:"C. 叫妈妈给自己买玩具当生日礼物",good:false,fb:"今天是妈妈的生日，我们要关心妈妈，而不是向妈妈要东西哦！"}
+   ]},
+  {tag:"勇敢",tagColor:"#C9A000",tagBg:"#FFF5D6",border:"#FFE066",
+   story:"体育课要学跳高，嘉禾有点害怕，不敢跳。其他同学都跳过去了，老师在鼓励嘉禾。",
+   q:"嘉禾应该怎么做？",
+   opts:[
+     {text:"A. 哭着说不要，一直不跳",good:false,fb:"勇敢不是不害怕，而是虽然害怕，但还是去尝试！"},
+     {text:"B. 深呼吸，告诉自己我能行，然后跳过去",good:true,fb:"太勇敢了！面对挑战，不放弃，这种精神非常值得称赞！相信自己！"},
+     {text:"C. 说肚子痛，不上课了",good:false,fb:"逃避不能解决问题，勇敢面对才是正确的做法！老师和同学会支持你！"}
+   ]},
+  {tag:"友善",tagColor:"#3A90B5",tagBg:"#E8F5FA",border:"#A8D8EA",
+   story:"学校来了一个新同学，他一个人坐在角落，看起来很不开心，不知道和谁玩。",
+   q:"嘉禾应该怎么做？",
+   opts:[
+     {text:"A. 不管他，和老朋友玩",good:false,fb:"新同学需要朋友，我们应该主动去认识他，让他感受到温暖！"},
+     {text:"B. 走过去，说你好，我叫嘉禾，我们做朋友吧！",good:true,fb:"太有爱心了！主动和新同学交朋友，是友善的表现，他一定很开心！"},
+     {text:"C. 偷偷看他，但不去打招呼",good:false,fb:"我们要勇敢地迈出第一步，主动打招呼，这样才能交到新朋友！"}
+   ]},
+  {tag:"节约",tagColor:"#4A9A50",tagBg:"#E8F8EE",border:"#B5D5B0",
+   story:"嘉禾洗手时，把水龙头开得很大，洗完手后忘记关水，水一直在流。妈妈看到了。",
+   q:"正确的做法是什么？",
+   opts:[
+     {text:"A. 水不贵，没关系",good:false,fb:"水资源是有限的，每滴水都来之不易，我们要节约用水！"},
+     {text:"B. 赶快关掉水龙头，以后记得及时关水",good:true,fb:"非常棒！节约用水是保护地球的重要行动，你真的很有环保意识！"},
+     {text:"C. 让妈妈来关",good:false,fb:"节约用水是每个人的责任，我们要自己主动关好水龙头！"}
+   ]},
+  {tag:"礼貌",tagColor:"#C07000",tagBg:"#FFF3E0",border:"#FFB347",
+   story:"嘉禾去朋友家里玩，朋友的妈妈端来了水果和点心，嘉禾伸手就要拿。",
+   q:"嘉禾应该先做什么？",
+   opts:[
+     {text:"A. 直接拿来吃",good:false,fb:"做客时要有礼貌，要先说谢谢，再慢慢享用！"},
+     {text:"B. 先说谢谢阿姨，然后再拿",good:true,fb:"说得对！有礼貌的孩子人人喜欢，谢谢你展示了这么好的礼仪！"},
+     {text:"C. 问妈妈我能不能吃",good:false,fb:"可以先说谢谢，但在朋友家做客，只要主人准备了就可以享用！"}
+   ]},
+  {tag:"宽容",tagColor:"#C05080",tagBg:"#FDE8EE",border:"#F4A0B5",
+   story:"好朋友小明不小心把嘉禾最喜欢的铅笔盒碰到地上，弄坏了。小明非常难过，一直道歉。",
+   q:"嘉禾应该怎么做？",
+   opts:[
+     {text:"A. 大哭大闹，说小明坏",good:false,fb:"铅笔盒坏了确实让人难过，但原谅是因为小明是不小心的，宽容是美德！"},
+     {text:"B. 原谅小明，说没关系，不是故意的",good:true,fb:"你真的很有大度！宽容是非常珍贵的品质，小明一定也会珍惜你这个好朋友！"},
+     {text:"C. 再也不和小明玩了",good:false,fb:"小明是不小心的，不要因为意外而失去好朋友。原谅和理解让友谊更长久！"}
+   ]},
+  {tag:"勤劳",tagColor:"#3DAA78",tagBg:"#E8F8F2",border:"#A8E6CF",
+   story:"周末，爸爸妈妈在打扫房间，嘉禾想着今天是周末，可以一直玩玩具。",
+   q:"嘉禾应该怎么做？",
+   opts:[
+     {text:"A. 继续玩，家务是大人的事",good:false,fb:"家是每个人的家，家务也是每个人的责任，孩子也可以力所能及地帮忙！"},
+     {text:"B. 主动问爸妈自己能帮什么忙",good:true,fb:"真是个勤劳的好孩子！主动帮忙做家务，是爱家的表现，爸妈一定很感动！"},
+     {text:"C. 等爸妈叫了才去帮忙",good:false,fb:"主动比被动更体现勤劳的品质，下次试试主动去帮忙吧！"}
+   ]},
+  {tag:"爱护环境",tagColor:"#4A9A50",tagBg:"#E8F8EE",border:"#B5D5B0",
+   story:"嘉禾和爸爸在公园散步，嘉禾吃完零食，旁边没有垃圾桶。",
+   q:"嘉禾应该怎么做？",
+   opts:[
+     {text:"A. 扔在草坪上，反正会烂掉",good:false,fb:"随手乱扔垃圾会污染环境，我们要保护公共环境，做文明市民！"},
+     {text:"B. 把包装纸放进口袋，找到垃圾桶再丢",good:true,fb:"太棒了！带走自己的垃圾是爱护环境的最好行动，你是环保小卫士！"},
+     {text:"C. 让爸爸来拿，跑开玩了",good:false,fb:"自己产生的垃圾要自己负责处理，不要依赖别人，这是对环境负责的态度！"}
+   ]},
+  {tag:"孝顺",tagColor:"#7A5CB8",tagBg:"#F2EEF9",border:"#C9B8E8",
+   story:"奶奶腿不太好，上楼梯有些困难。嘉禾和奶奶一起回家，要爬三层楼梯。",
+   q:"嘉禾应该怎么做？",
+   opts:[
+     {text:"A. 自己先跑上去等奶奶",good:false,fb:"长辈需要照顾，我们要在旁边帮助他们，不要把他们落在后面！"},
+     {text:"B. 陪在奶奶身边，扶着她慢慢上楼",good:true,fb:"太孝顺了！关心和照顾老人是中华美德，奶奶有你这样的孙子孙女真幸福！"},
+     {text:"C. 叫奶奶慢点，自己先上去开门",good:false,fb:"扶着奶奶上楼比开门更重要，安全才是第一位的！"}
+   ]},
+  {tag:"诚实",tagColor:"#C07000",tagBg:"#FFF3E0",border:"#FFB347",
+   story:"嘉禾打碎了家里的花瓶，没有人看到。她可以假装不知道，也可以告诉爸妈。",
+   q:"嘉禾应该怎么做？",
+   opts:[
+     {text:"A. 把碎片藏起来，假装什么都没有发生",good:false,fb:"掩盖错误比犯错更不好，诚实地承认才是勇敢的表现！"},
+     {text:"B. 主动告诉爸妈，说自己不小心打碎了花瓶",good:true,fb:"非常诚实！承认错误需要很大的勇气，爸妈会更欣赏你的诚实而不是责怪你！"},
+     {text:"C. 等爸妈发现了再说",good:false,fb:"主动承认比被发现要好得多，诚实是最好的品格！"}
+   ]},
+  {tag:"谦虚",tagColor:"#3A90B5",tagBg:"#E8F5FA",border:"#A8D8EA",
+   story:"考试嘉禾得了满分，同学们都来恭喜她，嘉禾感到非常开心，想着自己最厉害了。",
+   q:"嘉禾应该有什么态度？",
+   opts:[
+     {text:"A. 告诉所有人我是最聪明的",good:false,fb:"成绩好值得开心，但骄傲会让我们停止进步，谦虚才能持续成长！"},
+     {text:"B. 谢谢大家，我还要继续努力才行",good:true,fb:"太棒了！谦虚是优秀的品质，只有保持谦虚，才能不断进步！"},
+     {text:"C. 觉得以后不用努力了",good:false,fb:"一次好成绩只是开始，保持谦虚继续努力，才能取得更好的成绩！"}
+   ]},
+  {tag:"关爱",tagColor:"#C04070",tagBg:"#FDE8EE",border:"#F4A0B5",
+   story:"同学小红生病了，很难受地坐在座位上，看起来很需要帮助。",
+   q:"嘉禾应该怎么做？",
+   opts:[
+     {text:"A. 不管她，继续做自己的事",good:false,fb:"同学生病了，我们应该关心他们，给予帮助和温暖！"},
+     {text:"B. 去问小红是否需要帮助，请老师来看看",good:true,fb:"真有爱心！关心生病的同学，及时告知老师，是负责任和有爱心的表现！"},
+     {text:"C. 告诉其他同学小红生病了",good:false,fb:"应该直接去帮助小红，或者请老师来，而不只是传播消息！"}
+   ]},
+  {tag:"认真",tagColor:"#4A9A50",tagBg:"#E8F8EE",border:"#B5D5B0",
+   story:"嘉禾在做作业，但今天的电视节目很好看，她很想去看。作业还有一半没做完。",
+   q:"嘉禾应该怎么做？",
+   opts:[
+     {text:"A. 先去看电视，作业以后再做",good:false,fb:"先完成作业是对自己负责，也是对老师和父母的尊重！"},
+     {text:"B. 认真把作业做完，然后才去看电视",good:true,fb:"好样的！先完成任务再享乐，这是认真负责的好品质！"},
+     {text:"C. 随便写写，快点完成就好",good:false,fb:"做作业要认真，马虎了事对自己的学习没有好处！"}
+   ]},
+  {tag:"互助",tagColor:"#7A5CB8",tagBg:"#F2EEF9",border:"#C9B8E8",
+   story:"上体育课时，同学小强跑步摔倒了，手破了在流血，老师暂时不在旁边。",
+   q:"嘉禾应该怎么做？",
+   opts:[
+     {text:"A. 继续跑自己的，不管小强",good:false,fb:"同学受伤了需要帮助，我们要互相帮助，这是同学之间的情谊！"},
+     {text:"B. 停下来帮助小强，去找老师来处理",good:true,fb:"太有爱心了！在同学需要帮助的时候，你能挺身而出，真的非常了不起！"},
+     {text:"C. 叫别的同学去帮，自己继续跑",good:false,fb:"自己也可以先帮助，而不是只叫别人帮。互相帮助才是好朋友！"}
+   ]},
+  {tag:"守信",tagColor:"#C9A000",tagBg:"#FFF5D6",border:"#FFE066",
+   story:"嘉禾和好朋友约好明天一起去公园玩，但今天突然有一个更有趣的活动邀请。",
+   q:"嘉禾应该怎么做？",
+   opts:[
+     {text:"A. 去参加新活动，忘了和朋友的约定",good:false,fb:"守信是非常重要的品质，答应了别人的事就要做到，否则会失去朋友的信任！"},
+     {text:"B. 遵守和朋友的约定，去公园玩",good:true,fb:"真守信！言而有信是朋友之间最重要的事，你的朋友一定非常信任你！"},
+     {text:"C. 告诉朋友不去了，但不说原因",good:false,fb:"要守信，但如果真的不能去，要诚实地解释，并请求朋友原谅。"}
+   ]},
+  {tag:"爱国",tagColor:"#3DAA78",tagBg:"#E8F8F2",border:"#A8E6CF",
+   story:"升旗仪式上，要唱国歌、向国旗敬礼。有些同学在悄悄说话。",
+   q:"嘉禾应该怎么做？",
+   opts:[
+     {text:"A. 跟着一起说话",good:false,fb:"升旗仪式是严肃神圣的时刻，要保持安静，表达对国家的尊重！"},
+     {text:"B. 认真站好，大声唱国歌，向国旗敬礼",good:true,fb:"真有爱国情怀！认真对待升旗仪式，是对祖国的热爱和尊重！"},
+     {text:"C. 站着但心不在焉",good:false,fb:"升旗仪式要专注，用心去感受对国家的热爱和自豪！"}
+   ]}
+];
+
+var MATH_WORD_PROBLEMS = [
+  {q:"小明有5个苹果，妈妈又给了他3个，小明一共有几个苹果？",ans:8,hint:"5 + 3 = ?",type:"add"},
+  {q:"班级里有12个小朋友，走了4个，还剩几个小朋友？",ans:8,hint:"12 - 4 = ?",type:"sub"},
+  {q:"嘉禾有8颗糖，送给妹妹3颗，嘉禾还有几颗糖？",ans:5,hint:"8 - 3 = ?",type:"sub"},
+  {q:"花园里有6朵红花，4朵黄花，一共有几朵花？",ans:10,hint:"6 + 4 = ?",type:"add"},
+  {q:"小猫咪有4条腿，2只小猫咪一共有几条腿？",ans:8,hint:"4 × 2 = ?",type:"mul"},
+  {q:"嘉禾有10块饼干，吃了3块，还剩几块？",ans:7,hint:"10 - 3 = ?",type:"sub"},
+  {q:"树上有7只小鸟，飞来了2只，树上现在有几只小鸟？",ans:9,hint:"7 + 2 = ?",type:"add"},
+  {q:"小明有6颗弹珠，小红有5颗，他们一共有几颗弹珠？",ans:11,hint:"6 + 5 = ?",type:"add"},
+  {q:"一盒蜡笔有12支，用了5支，还剩几支？",ans:7,hint:"12 - 5 = ?",type:"sub"},
+  {q:"嘉禾每天喝2杯水，3天喝几杯？",ans:6,hint:"2 × 3 = ?",type:"mul"},
+  {q:"教室里有15个座位，坐了8个小朋友，还有几个空座位？",ans:7,hint:"15 - 8 = ?",type:"sub"},
+  {q:"妈妈买了4个橙子、3个苹果，一共买了几个水果？",ans:7,hint:"4 + 3 = ?",type:"add"},
+  {q:"嘉禾看了8页书，还有5页没看，这本书一共有几页？",ans:13,hint:"8 + 5 = ?",type:"add"},
+  {q:"小花有20张贴纸，送给朋友9张，还剩几张贴纸？",ans:11,hint:"20 - 9 = ?",type:"sub"},
+  {q:"一只蝴蝶有2只翅膀，4只蝴蝶一共有几只翅膀？",ans:8,hint:"2 × 4 = ?",type:"mul"},
+  {q:"小超市里有16瓶水，卖出了7瓶，还剩几瓶？",ans:9,hint:"16 - 7 = ?",type:"sub"},
+  {q:"小明家有3个书架，每个书架放5本书，一共有几本书？",ans:15,hint:"3 × 5 = ?",type:"mul"},
+  {q:"操场上跑了9圈，还要再跑6圈，一共要跑几圈？",ans:15,hint:"9 + 6 = ?",type:"add"},
+  {q:"一包糖有18颗，吃了6颗，还剩几颗？",ans:12,hint:"18 - 6 = ?",type:"sub"},
+  {q:"班级有24个学生，其中13个是女生，有几个男生？",ans:11,hint:"24 - 13 = ?",type:"sub"}
+];
+// ===== STATE =====
+var appState = {
+  totalStars: parseInt(localStorage.getItem('lh_stars') || '0'),
+  favorites: JSON.parse(localStorage.getItem('lh_favs') || '[]'),
+  currentScene: null,
+  currentSentIdx: 0,
+  mathType: 'add',
+  mathCorrect: 0,
+  mathWrong: 0,
+  mathStarsEarned: 0,
+  currentMathAns: 0,
+  currentMathIsCompare: false,
+  sciTopic: 'animals',
+  sciIdx: 0,
+  sciAnswered: false,
+  virtueIdx: 0,
+  virtueAnswered: false,
+  studentName: localStorage.getItem('lh_name') || 'name here',
+  streakDays: parseInt(localStorage.getItem('lh_streak') || '1')
+};
+
+function saveAppState() {
+  localStorage.setItem('lh_stars', appState.totalStars);
+  localStorage.setItem('lh_favs', JSON.stringify(appState.favorites));
+  localStorage.setItem('lh_name', appState.studentName);
+}
+
+// ===== INIT =====
+function init() {
+  // Banner stars
+  var bs = document.getElementById('bannerStars');
+  for (var i = 0; i < 10; i++) {
+    var s = document.createElement('span');
+    s.className = 'bstar';
+    s.textContent = ['★','✦','·'][i % 3];
+    s.style.cssText = 'left:' + Math.random()*100 + '%;top:' + Math.random()*100 + '%;animation-delay:' + Math.random()*2 + 's;opacity:0.4;color:#FFD166;';
+    bs.appendChild(s);
+  }
+  document.getElementById('studentNameDisplay').textContent = appState.studentName;
+  document.getElementById('nameInput').value = appState.studentName;
+  document.getElementById('totalStars').textContent = appState.totalStars;
+  document.getElementById('streakDays').textContent = appState.streakDays;
+  buildScenes();
+  buildPinyin();
+  buildPoems();
+  buildSciTopics();
+  loadSciQ();
+  loadVirtue();
+  newMathQ();
+  if (window.speechSynthesis) {
+    window.speechSynthesis.getVoices();
+    window.speechSynthesis.onvoiceschanged = function() { window.speechSynthesis.getVoices(); };
+  }
+}
+
+// ===== NAME EDIT =====
+function toggleNameEdit() {
+  var row = document.getElementById('nameInputRow');
+  row.style.display = row.style.display === 'block' ? 'none' : 'block';
+  if (row.style.display === 'block') document.getElementById('nameInput').focus();
+}
+function saveName() {
+  var val = document.getElementById('nameInput').value.trim() || 'name here';
+  appState.studentName = val;
+  document.getElementById('studentNameDisplay').textContent = val;
+  document.getElementById('nameInputRow').style.display = 'none';
+  saveAppState();
+}
+
+// ===== TABS =====
+function switchSubject(sub) {
+  document.querySelectorAll('.view').forEach(function(v) { v.classList.remove('active'); });
+  document.querySelectorAll('.stab').forEach(function(t) { t.classList.remove('active'); });
+  document.getElementById('view-' + sub).classList.add('active');
+  document.getElementById('tab-' + sub).classList.add('active');
+  if (sub === 'favorites') loadFavorites();
+  if (sub === 'chinese') {
+    // show pinyin by default
+    ['chars','poems','stories'].forEach(function(p) {
+      var el = document.getElementById('ch-' + p);
+      if (el) el.style.display = 'none';
+    });
+    var pp = document.getElementById('ch-pinyin');
+    if (pp) pp.style.display = 'block';
+    document.querySelectorAll('.ch-tab').forEach(function(b) { b.style.opacity = '0.6'; });
+    var firstTab = document.getElementById('cht-pinyin');
+    if (firstTab) firstTab.style.opacity = '1';
+  }
+}
+
+// ===== ENGLISH =====
+function buildScenes() {
+  var g = document.getElementById('sceneGrid');
+  g.innerHTML = ENGLISH_SCENES.map(function(s) {
+    return '<div class="scene-card" style="border-color:' + s.border + ';background:' + s.bg + ';" onclick="openLesson(\'' + s.id + '\')">' +
+      '<span class="scb" style="background:' + s.color + ';">' + s.badge + '</span>' +
+      '<div class="sce">' + s.emoji + '</div>' +
+      '<div class="scn">' + s.name + '</div>' +
+      '<div class="scd">' + s.desc + '</div></div>';
+  }).join('');
+}
+
+function openLesson(id) {
+  appState.currentScene = null;
+  for (var i = 0; i < ENGLISH_SCENES.length; i++) {
+    if (ENGLISH_SCENES[i].id === id) { appState.currentScene = ENGLISH_SCENES[i]; break; }
+  }
+  if (!appState.currentScene) return;
+  appState.currentSentIdx = 0;
+  document.getElementById('lessonTitle').textContent = appState.currentScene.name;
+  document.getElementById('lessonDesc').textContent = appState.currentScene.desc;
+  document.getElementById('lessonEmoji').textContent = appState.currentScene.emoji;
+  document.getElementById('lessonOverlay').classList.add('show');
+  document.body.style.overflow = 'hidden';
+  renderSentence();
+  renderSentList();
+}
+function closeLesson() {
+  document.getElementById('lessonOverlay').classList.remove('show');
+  document.body.style.overflow = '';
+}
+function renderSentence() {
+  var sc = appState.currentScene;
+  var s = sc.sentences[appState.currentSentIdx];
+  var total = sc.sentences.length;
+  document.getElementById('progFill').style.width = Math.round(((appState.currentSentIdx + 1) / total) * 100) + '%';
+  var parts = s.person.split('|');
+  document.getElementById('pIcon').textContent = parts[0];
+  document.getElementById('pLabel').textContent = parts[1] || '说';
+  document.getElementById('sentENText').textContent = s.en;
+  document.getElementById('sentZH').textContent = s.zh;
+  document.getElementById('sentCtx').textContent = s.ctx || '';
+  var isFav = appState.favorites.some(function(f) { return f.en === s.en; });
+  document.getElementById('favStarBtn').textContent = isFav ? '★' : '☆';
+  if (isFav) document.getElementById('favStarBtn').classList.add('fav');
+  else document.getElementById('favStarBtn').classList.remove('fav');
+  document.querySelectorAll('.sent-list-item').forEach(function(el, i) {
+    if (i === appState.currentSentIdx) el.classList.add('active');
+    else el.classList.remove('active');
+  });
+}
+function renderSentList() {
+  var sc = appState.currentScene;
+  document.getElementById('sentListCount').textContent = 'shared ' + sc.sentences.length + ' shared';
+  document.getElementById('sentListCount').textContent = sc.sentences.length + ' 句';
+  var html = '';
+  sc.sentences.forEach(function(s, i) {
+    var safeEn = s.en.replace(/'/g, "\\'");
+    html += '<div class="sent-list-item' + (i === appState.currentSentIdx ? ' active' : '') + '" onclick="jumpSent(' + i + ')">' +
+      '<div class="sli-num">' + (i+1) + '</div>' +
+      '<div style="flex:1;"><div class="sli-en">' + s.en + '</div><div class="sli-zh">' + s.zh + '</div></div>' +
+      '<button class="sli-play" onclick="event.stopPropagation();speakText(\'' + safeEn + '\',1)">🔊</button></div>';
+  });
+  document.getElementById('sentList').innerHTML = html;
+}
+function jumpSent(i) {
+  appState.currentSentIdx = i;
+  renderSentence();
+  document.querySelectorAll('.sent-list-item').forEach(function(el, idx) {
+    if (idx === i) el.classList.add('active'); else el.classList.remove('active');
+  });
+}
+function prevSent() {
+  if (appState.currentSentIdx > 0) { appState.currentSentIdx--; renderSentence(); }
+}
+function nextSent() {
+  if (appState.currentSentIdx < appState.currentScene.sentences.length - 1) {
+    appState.currentSentIdx++;
+    renderSentence();
+  } else {
+    alert('本场景全部学完了！太棒了！');
+  }
+}
+function speakText(text, rate) {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  var u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US';
+  u.rate = rate || 1;
+  u.pitch = 1.1;
+  var vs = window.speechSynthesis.getVoices();
+  var v = null;
+  for (var i = 0; i < vs.length; i++) {
+    if (vs[i].lang.indexOf('en-US') === 0 && vs[i].name.indexOf('Google') >= 0) { v = vs[i]; break; }
+  }
+  if (!v) for (var i = 0; i < vs.length; i++) {
+    if (vs[i].lang.indexOf('en-US') === 0) { v = vs[i]; break; }
+  }
+  if (v) u.voice = v;
+  var wb = document.getElementById('waveBars');
+  if (wb) wb.classList.add('on');
+  u.onend = function() { if (wb) wb.classList.remove('on'); };
+  window.speechSynthesis.speak(u);
+}
+function speakEN() {
+  if (appState.currentScene) speakText(appState.currentScene.sentences[appState.currentSentIdx].en, 1);
+}
+function speakENSlow() {
+  if (appState.currentScene) speakText(appState.currentScene.sentences[appState.currentSentIdx].en, 0.6);
+}
+function toggleEnFav() {
+  if (!appState.currentScene) return;
+  var s = appState.currentScene.sentences[appState.currentSentIdx];
+  var idx = -1;
+  for (var i = 0; i < appState.favorites.length; i++) {
+    if (appState.favorites[i].en === s.en) { idx = i; break; }
+  }
+  if (idx >= 0) {
+    appState.favorites.splice(idx, 1);
+    document.getElementById('favStarBtn').textContent = '☆';
+    document.getElementById('favStarBtn').classList.remove('fav');
+  } else {
+    appState.favorites.push({en: s.en, zh: s.zh, scene: appState.currentScene.name});
+    document.getElementById('favStarBtn').textContent = '★';
+    document.getElementById('favStarBtn').classList.add('fav');
+    floatStar();
+  }
+  saveAppState();
+}
+
+// ===== CHINESE =====
+function buildPinyin() {
+  var g = document.getElementById('pinyinGrid');
+  g.innerHTML = PINYIN_CHARS.map(function(c) {
+    return '<div class="pz-cell" onclick="speakChar(\'' + c.c + '\',this)">' +
+      '<div class="pz-char">' + c.c + '</div><div class="pz-py">' + c.p + '</div></div>';
+  }).join('');
+}
+function speakChar(ch, el) {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  var u = new SpeechSynthesisUtterance(ch);
+  u.lang = 'zh-CN';
+  u.rate = 0.8;
+  window.speechSynthesis.speak(u);
+  el.classList.add('active');
+  setTimeout(function() { el.classList.remove('active'); }, 700);
+}
+function buildPoems() {
+  var g = document.getElementById('poemList');
+  g.innerHTML = POEMS.map(function(p, pi) {
+    var pinyinHtml = p.lines.map(function(l) { return '<div>' + l.py + '</div>'; }).join('');
+    var textHtml = p.lines.map(function(l) { return l.hz; }).join('<br>');
+    return '<div class="poem-card">' +
+      '<div class="poem-title">' + p.title + '</div><div style="font-size:11px;color:#A0907C;margin-bottom:4px;">' + (p.grade||'') + '</div>' +
+      '<div class="poem-author">📝 ' + p.author + '</div>' +
+      '<div class="poem-pinyin-block" id="py-' + pi + '">' + pinyinHtml + '</div>' +
+      '<div class="poem-text">' + textHtml + '</div>' +
+      '<div class="poem-meaning" id="pm-' + pi + '">' + p.meaning + '</div>' +
+      '<div class="poem-actions">' +
+      '<button class="pa pa-read" onclick="speakPoem(' + pi + ')">🔊 朗诵</button>' +
+      '<button class="pa pa-py" onclick="togglePinyin(' + pi + ')">📖 拼音</button>' +
+      '<button class="pa pa-mean" onclick="toggleMeaning(' + pi + ')">💡 意思</button>' +
+      '</div></div>';
+  }).join('');
+}
+function speakPoem(pi) {
+  var p = POEMS[pi];
+  var text = p.lines.map(function(l) { return l.hz; }).join('，');
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  var u = new SpeechSynthesisUtterance(text);
+  u.lang = 'zh-CN';
+  u.rate = 0.75;
+  window.speechSynthesis.speak(u);
+}
+function togglePinyin(pi) {
+  var el = document.getElementById('py-' + pi);
+  el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+function toggleMeaning(pi) {
+  var el = document.getElementById('pm-' + pi);
+  el.style.display = el.style.display === 'block' ? 'none' : 'block';
+}
+
+// ===== MATH =====
+function genMathQ(type) {
+  var a, b;
+  if (type === 'add') {
+    a = Math.floor(Math.random() * 10) + 1;
+    b = Math.floor(Math.random() * 10) + 1;
+    return {q: a + ' + ' + b + ' = ?', ans: a + b, isCompare: false};
+  } else if (type === 'sub') {
+    a = Math.floor(Math.random() * 10) + 5;
+    b = Math.floor(Math.random() * a) + 1;
+    return {q: a + ' - ' + b + ' = ?', ans: a - b, isCompare: false};
+  } else if (type === 'mix') {
+    return genMathQ(Math.random() > 0.5 ? 'add' : 'sub');
+  } else if (type === 'count') {
+    a = Math.floor(Math.random() * 10) + 1;
+    var icons = ['🍎','🌟','🐣','🦋','🌸'];
+    var ic = icons[Math.floor(Math.random() * icons.length)];
+    var row = '';
+    for (var i = 0; i < a; i++) row += ic;
+    return {q: row + '\n= ?', ans: a, isCompare: false};
+  } else if (type === 'compare') {
+    a = Math.floor(Math.random() * 18) + 1;
+    b = Math.floor(Math.random() * 18) + 1;
+    while (a === b) b = Math.floor(Math.random() * 18) + 1;
+    return {q: a + '  □  ' + b, ans: a > b ? '>' : '<', isCompare: true};
+  }
+  return {q: '1 + 1 = ?', ans: 2, isCompare: false};
+}
+
+function setMathType(type, btn) {
+  appState.mathType = type;
+  document.querySelectorAll('.mt-btn').forEach(function(b) { b.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+  newMathQ();
+}
+
+function newMathQ() {
+  var d = genMathQ(appState.mathType);
+  appState.currentMathAns = d.ans;
+  appState.currentMathIsCompare = d.isCompare;
+  document.getElementById('mathQ').textContent = d.q;
+  document.getElementById('mathResult').className = 'math-result';
+  document.getElementById('mathResult').textContent = '';
+  document.getElementById('mathInput').value = '';
+  document.getElementById('mathInput').disabled = false;
+  var inputRow = document.getElementById('inputRow');
+  var opts = document.getElementById('mathOpts');
+  if (d.isCompare) {
+    inputRow.style.display = 'none';
+    opts.innerHTML = ['>', '<'].map(function(c) {
+      return '<button class="math-opt" style="font-size:26px;" onclick="checkMathOpt(\'' + c + '\',this)">' + c + '</button>';
+    }).join('');
+  } else {
+    inputRow.style.display = 'flex';
+    var correct = d.ans;
+    var choices = [correct];
+    var tries = 0;
+    while (choices.length < 4 && tries < 50) {
+      tries++;
+      var w = correct + Math.floor(Math.random() * 5) - 2;
+      if (w < 0) w = correct + Math.floor(Math.random() * 3) + 1;
+      var dup = false;
+      for (var i = 0; i < choices.length; i++) { if (choices[i] === w) { dup = true; break; } }
+      if (!dup && w >= 0) choices.push(w);
+    }
+    choices.sort(function() { return Math.random() - 0.5; });
+    opts.innerHTML = choices.map(function(c) {
+      return '<button class="math-opt" onclick="checkMathOpt(' + c + ',this)">' + c + '</button>';
+    }).join('');
+  }
+}
+
+function checkMathInput() {
+  var val = document.getElementById('mathInput').value.trim();
+  if (val === '') return;
+  var num = parseInt(val, 10);
+  checkMathOpt(appState.currentMathIsCompare ? val : num, null);
+}
+
+function checkMathOpt(val, btn) {
+  var correct = (String(val) === String(appState.currentMathAns));
+  document.querySelectorAll('.math-opt').forEach(function(b) {
+    b.disabled = true;
+    if (String(appState.currentMathIsCompare ? b.textContent.trim() : parseInt(b.textContent.trim(), 10)) === String(appState.currentMathAns)) {
+      b.classList.add('correct');
+    }
+  });
+  if (btn && !correct) btn.classList.add('wrong');
+  document.getElementById('mathInput').disabled = true;
+  var res = document.getElementById('mathResult');
+  if (correct) {
+    appState.mathCorrect++;
+    appState.mathStarsEarned++;
+    appState.totalStars++;
+    document.getElementById('mathCorrect').textContent = appState.mathCorrect;
+    document.getElementById('mathStarsEarned').textContent = appState.mathStarsEarned;
+    document.getElementById('totalStars').textContent = appState.totalStars;
+    saveAppState();
+    res.className = 'math-result ok show';
+    res.textContent = '🎉 答对了！太棒了！';
+    showReward(['做得太好了！','你真聪明！','满分！','完美！'][Math.floor(Math.random() * 4)], 1);
+    floatStar();
+    setTimeout(newMathQ, 2200);
+  } else {
+    appState.mathWrong++;
+    document.getElementById('mathWrong').textContent = appState.mathWrong;
+    res.className = 'math-result no show';
+    res.textContent = '答案是 ' + appState.currentMathAns + '，加油！下次一定行！';
+  }
+}
+
+// ===== SCIENCE =====
+function buildSciTopics() {
+  var g = document.getElementById('sciTopicGrid');
+  g.innerHTML = SCI_TOPICS.map(function(t) {
+    return '<div class="sci-topic" style="border-color:' + t.border + ';" id="sciTopic-' + t.id + '" onclick="setSciTopic(\'' + t.id + '\')">' +
+      '<div class="st-icon">' + t.emoji + '</div><div class="st-name">' + t.name + '</div></div>';
+  }).join('');
+  document.getElementById('sciTopic-animals').classList.add('active');
+}
+function setSciTopic(id) {
+  appState.sciTopic = id;
+  appState.sciIdx = 0;
+  appState.sciAnswered = false;
+  document.querySelectorAll('.sci-topic').forEach(function(el) { el.classList.remove('active'); });
+  var el = document.getElementById('sciTopic-' + id);
+  if (el) el.classList.add('active');
+  loadSciQ();
+}
+function loadSciQ() {
+  var qs = SCI_QS[appState.sciTopic] || SCI_QS.animals;
+  if (appState.sciIdx >= qs.length) appState.sciIdx = 0;
+  var q = qs[appState.sciIdx];
+  var topic = null;
+  for (var i = 0; i < SCI_TOPICS.length; i++) { if (SCI_TOPICS[i].id === appState.sciTopic) { topic = SCI_TOPICS[i]; break; } }
+  appState.sciAnswered = false;
+  var html = '<div style="font-size:11px;font-weight:800;color:var(--muted);margin-bottom:8px;">' +
+    (topic ? topic.emoji + ' ' + topic.name : '') + ' · 第' + (appState.sciIdx + 1) + '题/共' + qs.length + '题</div>' +
+    '<div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:10px;">' +
+    '<div class="sci-question" style="flex:1;margin-bottom:0;">' + q.q + '</div>' +
+    speakerBtn(q.q) +
+    '</div>' +
+    '<div class="sci-opts">' +
+    q.opts.map(function(o, i) {
+      return '<button class="sci-opt" onclick="checkSci(' + i + ',' + q.ans + ',this)">' +
+      '<span onclick="event.stopPropagation();readAloud(this.parentNode.innerText.replace(/🔊/g,\'\'))" style="float:right;font-size:13px;opacity:0.5;cursor:pointer;" title="朗读选项">🔊</span>' +
+      ['A','B','C','D'][i] + '. ' + o + '</button>';
+    }).join('') +
+    '</div>' +
+    '<div style="display:flex;align-items:flex-start;gap:6px;">' +
+    '<div class="sci-explain" id="sciExp" style="flex:1;">' + q.exp + '</div>' +
+    speakerBtn(q.exp) +
+    '</div>' +
+    '<button class="sci-next" id="sciNext" onclick="nextSciQ()">下一题 →</button>';
+  document.getElementById('sciQBody').innerHTML = html;
+}
+function checkSci(chosen, correct, btn) {
+  if (appState.sciAnswered) return;
+  appState.sciAnswered = true;
+  document.querySelectorAll('.sci-opt').forEach(function(b, i) {
+    b.disabled = true;
+    if (i === correct) b.classList.add('correct');
+  });
+  if (chosen !== correct) btn.classList.add('wrong');
+  else {
+    appState.totalStars++;
+    document.getElementById('totalStars').textContent = appState.totalStars;
+    saveAppState();
+    floatStar();
+  }
+  var exp = document.getElementById('sciExp');
+  var nxt = document.getElementById('sciNext');
+  if (exp) {
+    exp.classList.add('show');
+    var q2 = qs[appState.sciIdx];
+    if (q2) setTimeout(function(){ readAloud(chosen === correct ? '答对了！' + q2.exp : '答错了。' + q2.exp); }, 600);
+  }
+  if (nxt) nxt.classList.add('show');
+}
+function nextSciQ() {
+  appState.sciIdx = (appState.sciIdx + 1) % (SCI_QS[appState.sciTopic] || SCI_QS.animals).length;
+  loadSciQ();
+}
+
+// ===== VIRTUE =====
+function loadVirtue() {
+  var d = VIRTUE_DATA[appState.virtueIdx];
+  appState.virtueAnswered = false;
+  var optsHtml = d.opts.map(function(o, i) {
+    var raIdx = raStore(o.text);
+    return '<button class="virtue-opt" style="position:relative;" onclick="checkVirtue(' + i + ',this)">' +
+      '<span onclick="event.stopPropagation();readAloud(_raTexts[' + raIdx + '])" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:13px;cursor:pointer;opacity:0.6;" title="朗读选项">🔊</span>' +
+      o.text + '</button>';
+  }).join('');
+  var html = '<span class="virtue-tag" style="color:' + d.tagColor + ';background:' + d.tagBg + ';border-color:' + d.border + ';">' + d.tag + '</span>' +
+    '<div class="virtue-story" style="cursor:pointer;" onclick="readAloud(this.textContent)">' + d.story + '</div>' +
+    '<div style="text-align:right;margin-bottom:4px;">' + speakerBtn(d.story) + '</div>' +
+    '<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">' +
+    '<div class="virtue-question" style="flex:1;margin-bottom:0;">' + d.q + '</div>' +
+    speakerBtn(d.q) +
+    '</div>' +
+    '<div>' + optsHtml + '</div>' +
+    '<div class="virtue-feedback" id="vFeedback"></div>' +
+    '<button class="virtue-next-btn" id="vNext" onclick="nextVirtue()">下一个故事 →</button>' +
+    '<div style="text-align:center;margin-top:10px;font-size:12px;color:var(--muted);">第 ' + (appState.virtueIdx + 1) + ' / ' + VIRTUE_DATA.length + ' 个故事</div>';
+  document.getElementById('virtueBody').innerHTML = html;
+  setTimeout(function(){ readAloud(d.story + '。' + d.q); }, 300);
+}
+function checkVirtue(i, btn) {
+  if (appState.virtueAnswered) return;
+  appState.virtueAnswered = true;
+  var d = VIRTUE_DATA[appState.virtueIdx];
+  var opt = d.opts[i];
+  document.querySelectorAll('.virtue-opt').forEach(function(b) { b.disabled = true; });
+  var fb = document.getElementById('vFeedback');
+  var nxt = document.getElementById('vNext');
+  if (opt.good) {
+    btn.classList.add('good');
+    fb.className = 'virtue-feedback show good';
+    fb.textContent = '✅ ' + opt.fb;
+    setTimeout(function(){ readAloud(opt.fb); }, 400);
+    appState.totalStars += 2;
+    document.getElementById('totalStars').textContent = appState.totalStars;
+    saveAppState();
+    showReward('品德之星！', 2);
+    floatStar();
+    if (typeof playPraise === 'function') playPraise();
+  } else {
+    btn.classList.add('bad');
+    fb.className = 'virtue-feedback show bad';
+    fb.textContent = '💭 ' + opt.fb;
+    setTimeout(function(){ readAloud(opt.fb); }, 400);
+    if (typeof playCheer === 'function') playCheer();
+  }
+  if (nxt) nxt.classList.add('show');
+}
+function nextVirtue() {
+  appState.virtueIdx = (appState.virtueIdx + 1) % VIRTUE_DATA.length;
+  loadVirtue();
+}
+
+// ===== FAVORITES =====
+function loadFavorites() {
+  var b = document.getElementById('favBody');
+  if (!appState.favorites.length) {
+    b.innerHTML = '<div class="empty-state"><div class="ei">⭐</div><p>还没有收藏的句子<br>在英文场景中点 ☆ 收藏吧！</p></div>';
+    return;
+  }
+  b.innerHTML = appState.favorites.map(function(f, i) {
+    var safeEn = f.en.replace(/'/g, "\\'");
+    return '<div class="fav-item">' +
+      '<div style="font-size:18px;">🔤</div>' +
+      '<div style="flex:1;"><div class="fav-en">' + f.en + '</div><div class="fav-zh">' + f.zh + '</div><div class="fav-scene">' + (f.scene || '') + '</div></div>' +
+      '<span onclick="speakText(\'' + safeEn + '\',1)" style="font-size:20px;cursor:pointer;padding:4px;">🔊</span>' +
+      '<button class="fav-del" onclick="removeFav(' + i + ')">🗑️</button></div>';
+  }).join('');
+}
+function removeFav(i) {
+  appState.favorites.splice(i, 1);
+  saveAppState();
+  loadFavorites();
+}
+
+// ===== REWARD =====
+function showReward(title, stars) {
+  document.getElementById('rewardIcon').textContent = '⭐';
+  document.getElementById('rewardTitle').textContent = title || '太棒了！';
+  document.getElementById('rewardSub').textContent = '你获得了 ' + (stars || 1) + ' 颗星星！总计：' + appState.totalStars + ' ⭐';
+  document.getElementById('rewardPop').classList.add('show');
+}
+function closeReward() {
+  document.getElementById('rewardPop').classList.remove('show');
+}
+function floatStar() {
+  var el = document.createElement('div');
+  el.className = 'float-star';
+  el.textContent = '⭐';
+  el.style.left = (Math.random() * 60 + 20) + '%';
+  el.style.top = (Math.random() * 40 + 30) + '%';
+  document.body.appendChild(el);
+  setTimeout(function() { if (el.parentNode) el.parentNode.removeChild(el); }, 1100);
+}
+
+
+// ===== VOICE FEEDBACK =====
+var PRAISE_TEXTS = [
+  "你真的太棒了！",
+  "哇，你过分优秀了！",
+  "太厉害了，你做到了！",
+  "你真是个小天才！",
+  "超级无敌棒！",
+  "你让我太骄傲了！",
+  "完美！你真的很厉害！",
+  "你是最闪亮的小星星！"
+];
+var CHEER_TEXTS = [
+  "加油，再来一次！",
+  "没关系，你下次一定可以！",
+  "继续努力，你能行的！",
+  "不要放弃，再试一次吧！",
+  "每次错误都是成长的机会！"
+];
+
+function speakChinese(text, rate) {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  var u = new SpeechSynthesisUtterance(text);
+  u.lang = 'zh-CN';
+  u.rate = rate || 1;
+  u.pitch = 1.2;
+  window.speechSynthesis.speak(u);
+}
+
+function playPraise() {
+  var text = PRAISE_TEXTS[Math.floor(Math.random() * PRAISE_TEXTS.length)];
+  speakChinese(text);
+}
+
+function playCheer() {
+  var text = CHEER_TEXTS[Math.floor(Math.random() * CHEER_TEXTS.length)];
+  speakChinese(text);
+}
+
+// ===== CHINESE TABS =====
+function switchChinese(panel, btn) {
+  if (!document.getElementById('ch-' + panel)) return;
+  var panels = ['pinyin','chars','poems','stories'];
+  panels.forEach(function(p) {
+    var el = document.getElementById('ch-' + p);
+    if (el) el.style.display = 'none';
+  });
+  var show = document.getElementById('ch-' + panel);
+  if (show) show.style.display = 'block';
+  document.querySelectorAll('.ch-tab').forEach(function(b) {
+    b.style.opacity = '0.6';
+  });
+  if (btn) btn.style.opacity = '1';
+  if (panel === 'chars') buildCharThemes();
+  if (panel === 'stories') buildStories();
+}
+
+// ===== CHAR THEMES =====
+function buildCharThemes() {
+  var g = document.getElementById('charThemeGrid');
+  if (!g) return;
+  g.innerHTML = CHINESE_THEMES.map(function(t) {
+    return '<div style="border-radius:16px;padding:14px;text-align:center;cursor:pointer;border:2.5px solid ' + t.border + ';background:#fff;transition:all 0.2s;" onclick="openCharTheme(this.dataset.id)" data-id="' + t.id + '">' +
+      '<div style="font-size:28px;margin-bottom:6px;">' + t.emoji + '</div>' +
+      '<div style="font-size:12px;font-weight:800;color:#4A3728;">' + t.name + '</div>' +
+      '<div style="font-size:10px;color:#A0907C;margin-top:2px;">' + t.chars.length + '个字</div></div>';
+  }).join('');
+}
+
+function openCharTheme(id) {
+  var theme = null;
+  for (var i = 0; i < CHINESE_THEMES.length; i++) {
+    if (CHINESE_THEMES[i].id === id) { theme = CHINESE_THEMES[i]; break; }
+  }
+  if (!theme) return;
+  document.getElementById('charThemeTitle').textContent = theme.emoji + ' ' + theme.name;
+  document.getElementById('charLearnCard').style.display = 'block';
+  var html = '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;">';
+  theme.chars.forEach(function(c) {
+    html += '<div style="background:linear-gradient(135deg,' + theme.border + '30,#fff);border:2px solid ' + theme.border + ';border-radius:16px;padding:14px;text-align:center;cursor:pointer;" onclick="speakChar(this.dataset.ch,this)" data-ch="' + c.c + '">' +
+      '<div style="font-size:32px;font-weight:900;color:#4A3728;">' + c.c + '</div>' +
+      '<div style="font-size:13px;color:#3A90B5;font-weight:700;margin:4px 0;">' + c.p + '</div>' +
+      '<div style="font-size:11px;color:#A0907C;">' + c.mean + '</div>' +
+      '<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:4px;justify-content:center;">' +
+      c.words.map(function(w) {
+        return '<span style="background:#F5F0FF;border-radius:8px;padding:2px 8px;font-size:11px;font-weight:700;color:#7A5CB8;cursor:pointer;" onclick="event.stopPropagation();speakChinese(this.dataset.w)" data-w="' + w + '">' + w + '</span>';
+      }).join('') +
+      '</div></div>';
+  });
+  html += '</div>';
+  document.getElementById('charLearnBody').innerHTML = html;
+  document.getElementById('charLearnCard').scrollIntoView({behavior:'smooth'});
+}
+
+// ===== PICTURE STORIES =====
+function buildStories() {
+  var g = document.getElementById('storyList');
+  if (!g) return;
+  g.innerHTML = PICTURE_STORIES.map(function(s, si) {
+    var qHtml = s.questions.map(function(q, qi) {
+      var optsHtml = q.opts.map(function(o, oi) {
+        return '<button style="padding:10px 12px;border-radius:12px;border:2px solid #DDD0F5;background:#fff;font-size:13px;font-weight:700;cursor:pointer;width:100%;text-align:left;margin-bottom:6px;font-family:inherit;color:#4A3728;transition:all 0.15s;" onclick="checkStoryQ(' + si + ',' + qi + ',' + oi + ',' + q.ans + ',this)">' +
+          ['A','B','C','D'][oi] + '. ' + o + '</button>';
+      }).join('');
+      return '<div style="margin-bottom:14px;">' +
+        '<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">' +
+        '<div style="font-size:13px;font-weight:800;color:#4A3728;flex:1;">Q' + (qi+1) + '. ' + q.q + '</div>' +
+        speakerBtn(q.q) +
+        '</div>' +
+        optsHtml + '<div class="story-feedback" id="sf-' + si + '-' + qi + '" style="display:none;padding:10px;border-radius:10px;font-size:12px;font-weight:700;margin-top:4px;"></div>' +
+        '</div>';
+    }).join('');
+    var wordsHtml = s.words.map(function(w) {
+      return '<span style="background:#F2EEF9;border-radius:8px;padding:3px 10px;font-size:12px;font-weight:700;color:#7A5CB8;cursor:pointer;" onclick="speakChinese(this.dataset.w)" data-w="' + w + '">' + w + '</span>';
+    }).join('');
+    return '<div style="background:#fff;border-radius:18px;box-shadow:0 4px 20px rgba(100,80,60,0.10);padding:18px;margin-bottom:14px;border:2px solid #F2EEF9;">' +
+      '<div style="font-size:32px;text-align:center;margin-bottom:8px;">' + s.emoji + '</div>' +
+      '<div style="font-size:15px;font-weight:900;color:#4A3728;margin-bottom:8px;">' + s.title + '</div>' +
+      '<div style="font-size:13px;line-height:1.9;color:#5C4030;background:linear-gradient(135deg,#FFF5D6,#FFF0ED);border-radius:12px;padding:14px;margin-bottom:8px;border:2px solid #FFE0C8;cursor:pointer;" onclick="readAloud(this.innerText)" title="点击朗读">' + s.scene + '</div>' +
+    '<div style="text-align:right;margin-bottom:10px;">' + speakerBtn(s.scene) + '</div>' +
+      '<div style="font-size:12px;font-weight:800;color:#A0907C;margin-bottom:8px;">💭 ' + s.desc + '</div>' +
+      '<div style="margin-bottom:14px;"><div style="font-size:12px;font-weight:800;color:#A0907C;margin-bottom:6px;">📚 相关词语（点击朗读）</div><div style="display:flex;flex-wrap:wrap;gap:6px;">' + wordsHtml + '</div></div>' +
+      '<div style="font-size:13px;font-weight:800;color:#7A5CB8;margin-bottom:10px;">❓ 根据故事回答问题：</div>' +
+      qHtml + '</div>';
+  }).join('');
+}
+
+function checkStoryQ(si, qi, chosen, correct, btn) {
+  var btns = btn.parentNode.querySelectorAll('button');
+  btns.forEach(function(b) { b.disabled = true; });
+  var fb = document.getElementById('sf-' + si + '-' + qi);
+  if (chosen === correct) {
+    btn.style.background = '#A8E6CF';
+    btn.style.borderColor = '#3DAA78';
+    btn.style.color = '#1A5C35';
+    if (fb) { fb.style.display = 'block'; fb.style.background = '#E8F8F2'; fb.style.color = '#1A5C35'; fb.textContent = '✅ 回答正确！真棒！'; setTimeout(function(){readAloud('回答正确！真棒！');},300); }
+    appState.totalStars++;
+    document.getElementById('totalStars').textContent = appState.totalStars;
+    saveAppState();
+    playPraise();
+    floatStar();
+  } else {
+    btn.style.background = '#FFD6DC';
+    btn.style.borderColor = '#FF3355';
+    btns[correct].style.background = '#A8E6CF';
+    btns[correct].style.borderColor = '#3DAA78';
+    btns[correct].style.color = '#1A5C35';
+    if (fb) { fb.style.display = 'block'; fb.style.background = '#FFD6DC'; fb.style.color = '#C0203A'; fb.textContent = '💭 再想想！正确答案已标出。'; setTimeout(function(){readAloud('再想想，正确答案已标出。');},300); }
+    playCheer();
+  }
+}
+
+// ===== OVERRIDE showReward to add voice =====
+var _origShowReward = showReward;
+showReward = function(title, stars) {
+  _origShowReward(title, stars);
+  setTimeout(playPraise, 300);
+};
+
+// ===== MATH WORD PROBLEMS =====
+var currentWordProblem = null;
+
+function loadWordProblem() {
+  var idx = Math.floor(Math.random() * MATH_WORD_PROBLEMS.length);
+  currentWordProblem = MATH_WORD_PROBLEMS[idx];
+  var mathQEl = document.getElementById('mathQ');
+  mathQEl.textContent = currentWordProblem.q + '\n\n提示：' + currentWordProblem.hint;
+  // Auto-read the question aloud after short delay
+  setTimeout(function() { readAloud(currentWordProblem.q + '。提示：' + currentWordProblem.hint); }, 400);
+  document.getElementById('mathInput').value = '';
+  document.getElementById('mathInput').disabled = false;
+  document.getElementById('mathResult').className = 'math-result';
+  document.getElementById('mathResult').textContent = '';
+  // Generate MCQ options
+  var correct = currentWordProblem.ans;
+  var choices = [correct];
+  var tries = 0;
+  while (choices.length < 4 && tries < 50) {
+    tries++;
+    var w = correct + Math.floor(Math.random() * 7) - 3;
+    if (w < 0) w = correct + Math.floor(Math.random() * 4) + 1;
+    var dup = false;
+    for (var i = 0; i < choices.length; i++) { if (choices[i] === w) { dup = true; break; } }
+    if (!dup && w >= 0) choices.push(w);
+  }
+  choices.sort(function() { return Math.random() - 0.5; });
+  var opts = document.getElementById('mathOpts');
+  opts.innerHTML = choices.map(function(c) {
+    return '<button class="math-opt" onclick="checkWordProblem(' + c + ',this)">' + c + '</button>';
+  }).join('');
+}
+
+function checkWordProblem(val, btn) {
+  if (!currentWordProblem) return;
+  var correct = (val === currentWordProblem.ans);
+  document.querySelectorAll('.math-opt').forEach(function(b) {
+    b.disabled = true;
+    if (parseInt(b.textContent) === currentWordProblem.ans) b.classList.add('correct');
+  });
+  if (btn && !correct) btn.classList.add('wrong');
+  var res = document.getElementById('mathResult');
+  if (correct) {
+    appState.mathCorrect++;
+    appState.mathStarsEarned++;
+    appState.totalStars++;
+    document.getElementById('mathCorrect').textContent = appState.mathCorrect;
+    document.getElementById('mathStarsEarned').textContent = appState.mathStarsEarned;
+    document.getElementById('totalStars').textContent = appState.totalStars;
+    saveAppState();
+    res.className = 'math-result ok show';
+    res.textContent = '🎉 答对了！你真棒！';
+    showReward('应用题达人！', 1);
+    floatStar();
+    setTimeout(loadWordProblem, 2500);
+  } else {
+    appState.mathWrong++;
+    document.getElementById('mathWrong').textContent = appState.mathWrong;
+    res.className = 'math-result no show';
+    res.textContent = '再想想！答案是 ' + currentWordProblem.ans;
+    playCheer();
+  }
+}
+
+// ===== OVERRIDE setMathType to handle word =====
+var _origSetMathType = setMathType;
+setMathType = function(type, btn) {
+  if (type === 'word') {
+    appState.mathType = 'word';
+    document.querySelectorAll('.mt-btn').forEach(function(b) { b.classList.remove('active'); });
+    if (btn) btn.classList.add('active');
+    document.getElementById('inputRow').style.display = 'none';
+    var spkBtn = document.getElementById('mathQSpeaker'); if(spkBtn) spkBtn.style.display='block';
+    loadWordProblem();
+    return;
+  }
+  document.getElementById('inputRow').style.display = 'flex';
+  _origSetMathType(type, btn);
+  var spkBtn = document.getElementById('mathQSpeaker'); if(spkBtn) spkBtn.style.display='none';
+};
+
+// ===== OVERRIDE checkSci to add voice =====
+var _origCheckSci = checkSci;
+checkSci = function(chosen, correct, btn) {
+  _origCheckSci(chosen, correct, btn);
+  if (chosen === correct) playPraise();
+  else playCheer();
+};
+
+// ===== OVERRIDE checkVirtue to add voice =====
+var _origCheckVirtue = checkVirtue;
+checkVirtue = function(i, btn) {
+  _origCheckVirtue(i, btn);
+};
+
+// ===== OVERRIDE checkMathOpt to add voice =====
+var _origCheckMathOpt = checkMathOpt;
+checkMathOpt = function(val, btn) {
+  var wasCorrect = (String(val) === String(appState.currentMathAns));
+  _origCheckMathOpt(val, btn);
+  if (wasCorrect) setTimeout(playPraise, 200);
+  else setTimeout(playCheer, 200);
+};
+
+
+// ===== READ ALOUD HELPER =====
+var _raTexts = [];
+function readAloud(text) {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  var u = new SpeechSynthesisUtterance(text);
+  u.lang = 'zh-CN';
+  u.rate = 0.85;
+  u.pitch = 1.1;
+  window.speechSynthesis.speak(u);
+}
+
+function raStore(text) {
+  _raTexts.push(text);
+  return _raTexts.length - 1;
+}
+
+function speakerBtn(text) {
+  var idx = raStore(text);
+  return '<button onclick="readAloud(_raTexts[' + idx + '])" style="background:none;border:2px solid #A8D8EA;border-radius:20px;padding:3px 10px;font-size:14px;cursor:pointer;color:#3A90B5;line-height:1;vertical-align:middle;margin-left:6px;flex-shrink:0;" title="点击朗读">🔊</button>';
+}
+
+// RUN
+init();
+</script>
+</body>
+</html>
